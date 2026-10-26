@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Quinchao",
+    "slug": "quinchao-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "quinchao",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "plugins": ["expo-router"],
+    "ios": { "supportsTablet": false, "bundleIdentifier": "cl.ulagos.quinchao" },
+    "android": { "package": "cl.ulagos.quinchao" }
+  }
+}
