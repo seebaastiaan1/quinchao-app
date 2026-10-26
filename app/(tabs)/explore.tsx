@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
-import { AppText, CategoryRow, PlaceCard, Screen } from '@/components';
+import { AppText, CategoryRow, EmptyState, PlaceCard, Screen } from '@/components';
 import { categories } from '@/data/categories';
 import { places } from '@/data/places';
 import { colors, fonts, radius, spacing } from '@/theme';
@@ -34,7 +34,7 @@ export default function ExploreScreen() {
       {query.trim() === '' ? (
         categories.map((c) => <CategoryRow key={c.key} category={c} onPress={() => router.push({ pathname: '/category/[key]', params: { key: c.key } })} />)
       ) : results.length === 0 ? (
-        <AppText variant="small">No encontramos resultados para “{query}”.</AppText>
+        <EmptyState message={`No encontramos resultados para “${query}”.`} />
       ) : (
         results.map((p) => <PlaceCard key={p.id} place={p} onPress={() => router.push({ pathname: '/place/[id]', params: { id: p.id } })} />)
       )}

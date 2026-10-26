@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
-import { AppText, Button, PlaceCard, Screen } from '@/components';
+import { AppText, Button, EmptyState, PlaceCard, Screen } from '@/components';
 import { callPlace } from '@/data/actions';
 import { getCategory } from '@/data/categories';
 import { placesByCategory } from '@/data/places';
@@ -40,9 +40,11 @@ export default function CategoryScreen() {
         </View>
       )}
       {/* TODO(plan fase 5): filtros "Cerca de mí" y "Abierto ahora" */}
-      {items.map((p) => (
-        <PlaceCard key={p.id} place={p} onPress={() => router.push({ pathname: '/place/[id]', params: { id: p.id } })} />
-      ))}
+      {items.length === 0 ? (
+        <EmptyState message="Todavía no hay lugares en esta categoría." />
+      ) : (
+        items.map((p) => <PlaceCard key={p.id} place={p} onPress={() => router.push({ pathname: '/place/[id]', params: { id: p.id } })} />)
+      )}
     </Screen>
   );
 }
