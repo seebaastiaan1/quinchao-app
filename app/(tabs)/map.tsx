@@ -1,61 +1,97 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AppText, Pill } from '@/components';
-import { categories } from '@/data/categories';
-import { getPlace, places } from '@/data/places';
-import type { CategoryKey } from '@/data/types';
-import { colors, radius, spacing } from '@/theme';
+import { MapCardList, MapFilters, useMapScreen } from '@/components';
+import { getCategory } from '@/data/categories';
+import { ISLAND_CENTER, type Bounds } from '@/data/map';
+import type { Place } from '@/data/types';
+import { colors, spacing } from '@/theme';
 
-// Centro aproximado de la isla Quinchao
-const INITIAL_REGION: Region = { latitude: -42.45, longitude: -73.47, latitudeDelta: 0.22, longitudeDelta: 0.22 };
+// Versión móvil (react-native-maps). En web se usa map.web.tsx (Leaflet).
+const INITIAL_REGION: Region = { latitude: ISLAND_CENTER.lat, longitude: ISLAND_CENTER.lng, latitudeDelta: 0.22, longitudeDelta: 0.22 };
+const MIN_DELTA = 0.03;
+
+const regionAround = (p: Place): Region => ({ latitude: p.lat, longitude: p.lng, latitudeDelta: 0.02, longitudeDelta: 0.02 });
+
+// Margen x2 para que los marcadores no queden bajo los paneles superior e inferior
+const regionFromBounds = (b: Bounds): Region => ({
+  latitude: (b.south + b.north) / 2,
+  longitude: (b.west + b.east) / 2,
+  latitudeDelta: Math.max((b.north - b.south) * 2, MIN_DELTA),
+  longitudeDelta: Math.max((b.east - b.west) * 2, MIN_DELTA),
+});
+
+const boundsFromRegion = (r: Region): Bounds => ({
+  south: r.latitude - r.latitudeDelta / 2,
+  north: r.latitude + r.latitudeDelta / 2,
+  west: r.longitude - r.longitudeDelta / 2,
+  east: r.longitude + r.longitudeDelta / 2,
+});
 
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { focus } = useLocalSearchParams<{ focus?: string }>();
   const mapRef = useRef<MapView>(null);
-  const [filter, setFilter] = useState<CategoryKey | 'todo'>('todo');
+  const map = useMapScreen({
+    frame: (b) => mapRef.current?.animateToRegion(b ? regionFromBounds(b) : INITIAL_REGION, 400),
+    center: (p) => mapRef.current?.animateToRegion(regionAround(p), 400),
+  });
+  const [initialRegion] = useState(() => {
+    const { place, bounds } = map.initialView;
+    if (place) return regionAround(place);
+    return bounds ? regionFromBounds(bounds) : INITIAL_REGION;
+  });
 
-  const visible = useMemo(() => (filter === 'todo' ? places : places.filter((p) => p.category === filter)), [filter]);
-
-  useEffect(() => {
-    const place = focus ? getPlace(focus) : undefined;
-    if (place) mapRef.current?.animateToRegion({ latitude: place.lat, longitude: place.lng, latitudeDelta: 0.02, longitudeDelta: 0.02 }, 400);
-  }, [focus]);
+  const openPlace = (p: Place) => router.push({ pathname: '/place/[id]', params: { id: p.id } });
 
   return (
     <View style={{ flex: 1 }}>
-      <MapView ref={mapRef} style={StyleSheet.absoluteFill} initialRegion={INITIAL_REGION}>
-        {visible.map((p) => (
-          <Marker
-            key={p.id}
-            coordinate={{ latitude: p.lat, longitude: p.lng }}
-            title={p.title}
-            description={p.note}
-            pinColor={colors.primary}
-            onCalloutPress={() => router.push({ pathname: '/place/[id]', params: { id: p.id } })}
-          />
-        ))}
+      <MapView
+        ref={mapRef}
+        style={StyleSheet.absoluteFill}
+        initialRegion={initialRegion}
+        onMapReady={() => map.setViewBounds(boundsFromRegion(initialRegion))}
+        onRegionChangeComplete={(r) => map.setViewBounds(boundsFromRegion(r))}
+      >
+        {map.visible.map((p) => {
+          const category = getCategory(p.category);
+          const selected = p.id === map.selectedId;
+          const size = selected ? 40 : 30;
+          return (
+            <Marker
+              key={p.id}
+              coordinate={{ latitude: p.lat, longitude: p.lng }}
+              title={p.title}
+              description={p.note}
+              onPress={() => map.selectPlace(p)}
+              onCalloutPress={() => openPlace(p)}
+            >
+              {/* Marcador con color e ícono por categoría (RF-05) */}
+              <View style={[styles.marker, { width: size, height: size, borderRadius: size / 2, backgroundColor: category?.color ?? colors.primary }]}>
+                <Ionicons name={category?.icon ?? 'location-outline'} size={selected ? 20 : 15} color={colors.white} />
+              </View>
+            </Marker>
+          );
+        })}
       </MapView>
 
-      {/* Panel de filtros (RF-05): todo / categorías */}
-      <View style={[styles.panel, { top: insets.top + spacing.sm }]}>
-        <AppText variant="eyebrow">Mapa de Quinchao</AppText>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.sm }}>
-          <Pill label="Todo" active={filter === 'todo'} onPress={() => setFilter('todo')} />
-          {categories.map((c) => (
-            <Pill key={c.key} label={c.label} active={filter === c.key} onPress={() => setFilter(c.key)} />
-          ))}
-        </ScrollView>
-        <AppText variant="small">{visible.length} lugares en esta área</AppText>
-      </View>
+      <MapFilters
+        filter={map.filter}
+        sector={map.sector}
+        count={map.visible.length}
+        onCategory={map.selectCategory}
+        onSector={map.selectSector}
+        style={{ top: insets.top + spacing.sm }}
+      />
+      <MapCardList places={map.visible} selectedId={map.selectedId} onSelect={map.selectPlace} onOpen={openPlace} style={styles.cards} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  panel: { position: 'absolute', left: spacing.md, right: spacing.md, backgroundColor: colors.white, borderRadius: radius.lg, padding: spacing.md, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 10, elevation: 5 },
+  marker: { alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.white },
+  cards: { position: 'absolute', left: 0, right: 0, bottom: spacing.sm },
 });

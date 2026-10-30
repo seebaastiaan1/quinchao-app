@@ -12,6 +12,7 @@ export interface Category {
   subtitle: string;
   intro: string;
   icon: IconName;
+  color: string; // color del marcador en el mapa (token de src/theme)
 }
 
 export interface Place {

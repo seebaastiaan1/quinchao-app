@@ -34,6 +34,12 @@ export default function CategoryScreen() {
         <AppText variant="title">{category.title}</AppText>
         <AppText>{category.intro}</AppText>
       </View>
+      <Button
+        label="Ver en el mapa"
+        icon="map-outline"
+        variant="outline"
+        onPress={() => router.push({ pathname: '/map', params: { category: category.key } })}
+      />
       {category.key === 'emergencias' && (
         <View style={{ gap: spacing.sm }}>
           <Button label="Llamar al 131 · Salud" icon="call-outline" variant="danger" onPress={() => callPlace('131')} />
