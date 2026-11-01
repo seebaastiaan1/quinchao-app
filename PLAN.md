@@ -60,7 +60,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 ### Fase 1 — Base visual (archivos: `src/theme`, `src/components`)
 - [ ] **1.1** Revisar que Poppins carga en todas las pantallas. *Verificación:* ningún texto usa la fuente del sistema.
 - [x] **1.2** Crear `src/components/EmptyState.tsx` (ícono + mensaje) y usarlo cuando una lista no tenga resultados.
-- [ ] **1.3** Añadir un componente `SectionHeader` (eyebrow + título) y usarlo en Inicio, Explorar y Categoría para evitar repetir estilos.
+- [x] **1.3** Añadir un componente `SectionHeader` (eyebrow + título) y usarlo en Inicio, Explorar y Categoría para evitar repetir estilos.
 
 ### Fase 2 — Contenido real (archivos: `src/data/*`)
 - [ ] **2.1** Reemplazar los lugares de ejemplo de **Gastronomía** por datos reales (nombre, sector, horario, teléfono, coordenadas verificadas). No inventar: si falta un dato, `// TODO(equipo)`.

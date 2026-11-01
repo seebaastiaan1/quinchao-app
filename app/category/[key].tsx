@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
-import { AppText, Button, EmptyState, PlaceCard, Screen } from '@/components';
+import { AppText, Button, EmptyState, PlaceCard, Screen, SectionHeader } from '@/components';
 import { callPlace } from '@/data/actions';
 import { getCategory } from '@/data/categories';
 import { placesByCategory } from '@/data/places';
@@ -30,8 +30,7 @@ export default function CategoryScreen() {
         <AppText style={{ color: colors.primary }}>Volver</AppText>
       </Pressable>
       <View style={{ gap: spacing.xs }}>
-        <AppText variant="eyebrow">{category.label}</AppText>
-        <AppText variant="title">{category.title}</AppText>
+        <SectionHeader eyebrow={category.label} title={category.title} />
         <AppText>{category.intro}</AppText>
       </View>
       {category.key === 'emergencias' && (
