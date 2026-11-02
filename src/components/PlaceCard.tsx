@@ -9,7 +9,7 @@ export function PlaceCard({ place, onPress }: { place: Place; onPress: () => voi
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={place.title} style={({ pressed }) => [styles.card, pressed && { opacity: 0.9 }]}>
       <View>
-        <Image source={{ uri: place.image }} style={styles.image} />
+        <Image source={typeof place.image === 'string' ? { uri: place.image } : place.image} style={styles.image} />
         <View style={styles.tag}>
           <AppText variant="small" style={{ color: colors.navy }}>{place.tag}</AppText>
         </View>

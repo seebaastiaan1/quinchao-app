@@ -5,7 +5,6 @@ import { Image, ImageBackground, Pressable, StyleSheet, TextInput, View } from '
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Button, CategoryRow, Screen, SectionHeader } from '@/components';
 import { categories } from '@/data/categories';
-import { photos } from '@/data/places';
 import { colors, fonts, radius, spacing } from '@/theme';
 
 export default function HomeScreen() {
@@ -17,7 +16,7 @@ export default function HomeScreen() {
 
   return (
     <Screen topInset={false} style={{ paddingHorizontal: 0 }}>
-      <ImageBackground source={{ uri: photos.hero }} style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}>
+      <ImageBackground source={require('../../assets/hero-background.jpg')} style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}>
         <View style={styles.shade} />
         <Image
           source={require('../../assets/logo-color.png')}

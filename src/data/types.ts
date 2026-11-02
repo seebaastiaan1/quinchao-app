@@ -20,7 +20,7 @@ export interface Place {
   title: string;
   area: string; // sector de la isla: Achao, Putique, Quinchao, Palqui...
   tag: string;
-  image: string;
+  image: string | number;
   note: string; // horario o dato corto
   description: string;
   address?: string;
