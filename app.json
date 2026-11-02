@@ -9,6 +9,7 @@
     "newArchEnabled": true,
     "plugins": ["expo-router"],
     "ios": { "supportsTablet": false, "bundleIdentifier": "cl.ulagos.quinchao" },
-    "android": { "package": "cl.ulagos.quinchao" }
+    "android": { "package": "cl.ulagos.quinchao" },
+    "web": { "bundler": "metro", "output": "single" }
   }
 }
