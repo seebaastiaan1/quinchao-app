@@ -5,6 +5,12 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "scheme": "quinchao",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "plugins": ["expo-router"],
