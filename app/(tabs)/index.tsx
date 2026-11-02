@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ImageBackground, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AppText, Button, CategoryRow, Screen } from '@/components';
+import { AppText, Button, CategoryRow, Screen, SectionHeader } from '@/components';
 import { categories } from '@/data/categories';
 import { photos } from '@/data/places';
 import { colors, fonts, radius, spacing } from '@/theme';
@@ -19,8 +19,12 @@ export default function HomeScreen() {
     <Screen topInset={false} style={{ paddingHorizontal: 0 }}>
       <ImageBackground source={{ uri: photos.hero }} style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}>
         <View style={styles.shade} />
-        <AppText variant="eyebrow" style={{ color: colors.sun }}>Bienvenidos a Quinchao</AppText>
-        <AppText variant="title" style={styles.heroTitle}>Islas con historias que merecen vivirse.</AppText>
+        <SectionHeader
+          eyebrow="Bienvenidos a Quinchao"
+          title="Islas con historias que merecen vivirse."
+          eyebrowStyle={{ color: colors.sun }}
+          titleStyle={styles.heroTitle}
+        />
         <AppText style={{ color: colors.white }}>Descubre paisajes, sabores y tradiciones en el corazón del archipiélago de Chiloé.</AppText>
         <View style={styles.search}>
           <Ionicons name="search-outline" size={20} color={colors.muted} />
