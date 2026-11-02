@@ -5,7 +5,7 @@ import type { IconName } from '@/data/types';
 
 const tab = (title: string, icon: IconName) => ({
   title,
-  tabBarIcon: ({ color, size }: { color: string; size: number }) => <Ionicons name={icon} size={size} color={color} />,
+  tabBarIcon: ({ color, size }: { color: unknown; size: number }) => <Ionicons name={icon} size={size} color={typeof color === 'string' ? color : colors.muted} />,
 });
 
 export default function TabsLayout() {

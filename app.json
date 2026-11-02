@@ -7,9 +7,22 @@
     "scheme": "quinchao",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "plugins": ["expo-router"],
-    "ios": { "supportsTablet": false, "bundleIdentifier": "cl.ulagos.quinchao" },
-    "android": { "package": "cl.ulagos.quinchao" },
-    "web": { "bundler": "metro", "output": "single" }
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-status-bar"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "cl.ulagos.quinchao"
+    },
+    "android": {
+      "package": "cl.ulagos.quinchao"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    }
   }
 }

@@ -108,8 +108,8 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 - [ ] **8.3** Confirmar con `Alert` antes de llamar a un número de emergencia.
 
 ### Fase 9 — Calendario de actividades (RF-03, prioridad media)
-- [ ] **9.1** Definir tipo `EventItem` (título, fecha, tipo cultural/deportiva/recreativa/comunitaria, lugar) y `src/data/events.ts`.
-- [ ] **9.2** Pantalla `app/events.tsx` con lista agrupada por fecha y filtro por tipo; enlazar desde Inicio.
+- [x] **9.1** Definir tipo `EventItem` (título, fecha, tipo cultural/deportiva/recreativa/comunitaria, lugar) y `src/data/events.ts`.
+- [x] **9.2** Pantalla `app/events.tsx` con lista agrupada por fecha y filtro por tipo; enlazar desde Inicio.
 
 ### Fase 10 — Calidad y entrega
 - [ ] **10.1** Accesibilidad: etiquetas, contraste, tamaño de texto del sistema, área táctil ≥ 44 px. [RNF-01]
