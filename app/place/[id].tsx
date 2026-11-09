@@ -27,7 +27,7 @@ export default function PlaceScreen() {
         <AppText style={{ color: colors.primary }}>Volver</AppText>
       </Pressable>
 
-      <Image source={{ uri: place.image }} style={{ width: '100%', height: 220, borderRadius: radius.lg, backgroundColor: colors.mist }} />
+      <Image source={typeof place.image === 'string' ? { uri: place.image } : place.image} style={{ width: '100%', height: 220, borderRadius: radius.lg, backgroundColor: colors.mist }} />
 
       <View style={{ gap: spacing.xs }}>
         <AppText variant="eyebrow">{place.tag} · {place.area}</AppText>

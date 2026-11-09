@@ -54,7 +54,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 - [ ] **0.1** Instalar dependencias: `npm install`. *Verificación:* termina sin errores.
 - [ ] **0.2** Alinear versiones con Expo Go: `npx expo install --fix` y `npx expo-doctor`. Si Expo Go exige un SDK más nuevo: `npx expo install expo@latest` y luego `npx expo install --fix`. *Verificación:* `npx expo-doctor` sin errores críticos.
 - [ ] **0.3** Ejecutar `npx expo start`, escanear el QR con Expo Go y ver las 4 pestañas. *Verificación:* la app abre sin pantalla roja.
-- [ ] **0.4** Crear `assets/icon.png` (1024×1024) y `assets/splash.png` con el logo y referenciarlos en `app.json` (`icon`, `splash`). *Verificación:* el ícono se ve en el build.
+- [x] **0.4** Crear `assets/icon.png` (1024×1024) y `assets/splash.png` con el logo y referenciarlos en `app.json` (`icon`, `splash`). *Verificación:* el ícono se ve en el build.
 - [ ] **0.5** `git init`, primer commit y repositorio compartido del equipo.
 
 ### Fase 1 — Base visual (archivos: `src/theme`, `src/components`)

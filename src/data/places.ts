@@ -17,7 +17,7 @@ export const places: Place[] = [
   // Gastronomía
   { id: 'fogon-isleno', category: 'gastronomia', title: 'Cocinería El Fogón Isleño', area: 'Achao', tag: 'Mariscos', image: photos.food, note: 'Abierto hasta las 21:00', description: 'Cocinería tradicional con productos del mar y recetas chilotas.', address: 'Costanera de Achao', lat: -42.4712, lng: -73.4905 },
   { id: 'sabores-del-puerto', category: 'gastronomia', title: 'Sabores del Puerto', area: 'Achao', tag: 'Cocina chilota', image: photos.food2, note: 'Abierto ahora', description: 'Platos de la cocina chilota frente al puerto.', address: 'Costanera de Achao', lat: -42.4705, lng: -73.4898 },
-  { id: 'mercado-municipal', category: 'gastronomia', title: 'Mercado Municipal', area: 'Achao', tag: 'Productos locales', image: photos.coast, note: 'Cierra a las 18:00', description: 'Productos locales, artesanía y comida típica.', address: 'Achao', lat: -42.4722, lng: -73.4912 },
+  { id: 'mercado-municipal', category: 'gastronomia', title: 'Mercado Municipal', area: 'Achao', tag: 'Productos locales', image: require('../../assets/Gastronomia/Mercado.jpg'), note: 'Cierra a las 18:00', description: 'Productos locales, artesanía y comida típica.', address: 'Achao', lat: -42.4722, lng: -73.4912 },
   // Hospedajes
   { id: 'cabanas-mirador', category: 'hospedajes', title: 'Cabañas Mirador del Canal', area: 'Putique', tag: 'Cabañas', image: photos.cabin, note: 'Desde $65.000 / noche', description: 'Cabañas con vista al canal Dalcahue.', lat: -42.4005, lng: -73.4985 },
   { id: 'hostal-la-minga', category: 'hospedajes', title: 'Hostal La Minga', area: 'Achao', tag: 'Hostal', image: photos.coast, note: 'Desayuno incluido', description: 'Hostal en el centro de Achao.', lat: -42.4698, lng: -73.4893 },

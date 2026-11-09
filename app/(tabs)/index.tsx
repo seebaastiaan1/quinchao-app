@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ImageBackground, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Image, ImageBackground, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Button, CategoryRow, Screen, SectionHeader } from '@/components';
 import { categories } from '@/data/categories';
-import { photos } from '@/data/places';
 import { colors, fonts, radius, spacing } from '@/theme';
 
 export default function HomeScreen() {
@@ -17,8 +16,14 @@ export default function HomeScreen() {
 
   return (
     <Screen topInset={false} style={{ paddingHorizontal: 0 }}>
-      <ImageBackground source={{ uri: photos.hero }} style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}>
+      <ImageBackground source={require('../../assets/hero-background.jpg')} style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}>
         <View style={styles.shade} />
+        <Image
+          source={require('../../assets/logo-color.png')}
+          accessibilityLabel="Municipalidad de Quinchao"
+          resizeMode="contain"
+          style={[styles.logo, { top: insets.top + spacing.lg }]}
+        />
         <SectionHeader
           eyebrow="Bienvenidos a Quinchao"
           title="Islas con historias que merecen vivirse."
@@ -58,6 +63,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   hero: { padding: spacing.lg, paddingBottom: spacing.xl, gap: spacing.sm, justifyContent: 'flex-end', minHeight: 420, overflow: 'hidden' },
   shade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(27,40,92,0.55)' },
+  logo: { position: 'absolute', alignSelf: 'center', width: 288, height: 82 },
   heroTitle: { color: colors.white, fontSize: 30, lineHeight: 38 },
   search: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.white, borderRadius: radius.md, paddingLeft: spacing.md, paddingRight: 6, paddingVertical: 6, marginTop: spacing.md },
   input: { flex: 1, fontFamily: fonts.regular, fontSize: 14, color: colors.ink, paddingVertical: 8 },
