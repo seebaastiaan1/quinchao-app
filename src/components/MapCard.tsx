@@ -18,7 +18,7 @@ export function MapCard({ place, selected, onPress, onOpen }: { place: Place; se
       accessibilityState={{ selected: !!selected }}
       style={[styles.card, selected && { borderColor: color }]}
     >
-      <Image source={{ uri: place.image }} style={styles.image} />
+      <Image source={typeof place.image === 'string' ? { uri: place.image } : place.image} style={styles.image} />
       <View style={styles.copy}>
         <View style={styles.meta}>
           <View style={[styles.dot, { backgroundColor: color }]} />
