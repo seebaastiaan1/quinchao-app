@@ -116,7 +116,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 ### Fase 10 — Calidad y entrega
 - [ ] **10.1** Accesibilidad: etiquetas, contraste, tamaño de texto del sistema, área táctil ≥ 44 px. [RNF-01]
 - [ ] **10.2** Rendimiento: listas con `FlatList`, imágenes con tamaño fijo; respuesta < 2 s. [RNF-02]
-- [ ] **10.3** Funcionamiento sin internet: los datos son locales; mostrar un mensaje amable si faltan imágenes/mapa.
+- [x] **10.3** Funcionamiento sin internet: los datos son locales; mostrar un mensaje amable si faltan imágenes/mapa. Copia de fotografías descargable (ver `docs/SIN_CONEXION.md`).
 - [ ] **10.4** Recorridos de usuario del documento (probar a mano y anotar resultados):
   1. Inicio → Gastronomía → Detalle → Mapa/Llamar.
   2. Inicio → Reciclaje → Detalle → Mapa.

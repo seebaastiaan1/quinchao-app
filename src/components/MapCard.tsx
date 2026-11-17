@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { categoryColor } from '@/data/categories';
 import type { Place } from '@/data/types';
 import { colors, fonts, radius, shadow, spacing } from '@/theme';
 import { AppText } from './AppText';
+import { PlaceImage } from './PlaceImage';
 
 export const MAP_CARD_WIDTH = 260;
 
@@ -18,7 +19,7 @@ export function MapCard({ place, selected, onPress, onOpen }: { place: Place; se
       accessibilityState={{ selected: !!selected }}
       style={[styles.card, selected && { borderColor: color }]}
     >
-      <Image source={typeof place.image === 'string' ? { uri: place.image } : place.image} style={styles.image} />
+      <PlaceImage image={place.image} style={styles.image} compact />
       <View style={styles.copy}>
         <View style={styles.meta}>
           <View style={[styles.dot, { backgroundColor: color }]} />

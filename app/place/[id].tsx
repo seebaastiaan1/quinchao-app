@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Image, Pressable, View } from 'react-native';
-import { AppText, Button, Screen } from '@/components';
+import { Pressable, View } from 'react-native';
+import { AppText, Button, PlaceImage, Screen } from '@/components';
 import { callPlace, openDirections } from '@/data/actions';
 import { usePlace, usePlaces } from '@/data/placesStore';
+import { useOffline } from '@/offline';
 import { colors, radius, spacing } from '@/theme';
 
 export default function PlaceScreen() {
@@ -11,6 +12,7 @@ export default function PlaceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { ready } = usePlaces();
   const place = usePlace(id);
+  const { isOnline } = useOffline();
 
   // Mientras se leen los datos guardados, un lugar recién creado todavía no aparece.
   if (!place && !ready) return <Screen>{null}</Screen>;
@@ -31,7 +33,7 @@ export default function PlaceScreen() {
         <AppText style={{ color: colors.primary }}>Volver</AppText>
       </Pressable>
 
-      <Image source={typeof place.image === 'string' ? { uri: place.image } : place.image} style={{ width: '100%', height: 220, borderRadius: radius.lg, backgroundColor: colors.mist }} />
+      <PlaceImage image={place.image} style={{ width: '100%', height: 220, borderRadius: radius.lg, backgroundColor: colors.mist }} />
 
       <View style={{ gap: spacing.xs }}>
         <AppText variant="eyebrow">{place.tag} · {place.area}</AppText>
@@ -63,6 +65,11 @@ export default function PlaceScreen() {
           variant="outline"
           onPress={() => router.push({ pathname: '/map', params: { focus: place.id } })}
         />
+        {!isOnline && (
+          <AppText variant="small">
+            Sin conexión: «Cómo llegar» y el mapa necesitan internet.{place.phone ? ' Llamar funciona sin internet.' : ''}{place.address ? ` Dirección: ${place.address}.` : ''}
+          </AppText>
+        )}
       </View>
     </Screen>
   );
