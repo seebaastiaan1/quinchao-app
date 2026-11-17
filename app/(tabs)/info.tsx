@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { View } from 'react-native';
-import { AppText, Button, Screen } from '@/components';
+import { AppText, Button, OfflineCard, Screen } from '@/components';
 import type { IconName } from '@/data/types';
 import { colors, radius, spacing } from '@/theme';
 
@@ -34,6 +34,8 @@ export default function InfoScreen() {
           <AppText variant="small">{item.text}</AppText>
         </View>
       ))}
+
+      <OfflineCard />
 
       <Button label="Ver contactos de emergencia" icon="call-outline" variant="danger" onPress={() => router.push({ pathname: '/category/[key]', params: { key: 'emergencias' } })} />
     </Screen>

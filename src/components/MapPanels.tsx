@@ -10,10 +10,11 @@ import { MAP_CARD_WIDTH, MapCard } from './MapCard';
 import { Pill } from './Pill';
 
 // Panel superior del mapa: filtro por categoría (RF-05), chips de sector y contador de lugares visibles.
-export function MapFilters({ filter, sector, count, onCategory, onSector, style }: {
+export function MapFilters({ filter, sector, count, notice, onCategory, onSector, style }: {
   filter: CategoryFilter;
   sector: string | null;
   count: number;
+  notice?: string; // aviso opcional (por ejemplo, sin conexión)
   onCategory: (c: CategoryFilter) => void;
   onSector: (s: string | null) => void;
   style?: StyleProp<ViewStyle>;
@@ -34,6 +35,7 @@ export function MapFilters({ filter, sector, count, onCategory, onSector, style 
         ))}
       </ScrollView>
       <AppText variant="small">{count === 1 ? '1 lugar en esta área' : `${count} lugares en esta área`}</AppText>
+      {notice && <AppText variant="small" style={{ color: colors.navy }}>{notice}</AppText>}
     </View>
   );
 }

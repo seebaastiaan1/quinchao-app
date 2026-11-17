@@ -9,3 +9,7 @@ npx expo start             # escanea el QR con Expo Go
 ```
 
 Lee `PLAN.md` (tareas) y `AGENTS.md` (reglas para agentes de IA).
+
+## Sin conexión
+
+La app se puede consultar en modo avión. Qué funciona siempre, qué requiere descarga previa y cómo probarlo: [`docs/SIN_CONEXION.md`](docs/SIN_CONEXION.md).
