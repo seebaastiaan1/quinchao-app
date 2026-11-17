@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Image, Platform, ScrollView, StyleSheet, View, type KeyboardTypeOptions } from 'react-native';
 import { categories } from '@/data/categories';
-import { draftToPlace, placeToDraft, validatePlace, type PlaceDraft, type PlaceErrors, type PlaceInput } from '@/data/placeForm';
+import { pickImageFromGallery } from '@/data/imagePicker';
+import { draftToPlace, isImageUri, placeToDraft, validatePlace, type PlaceDraft, type PlaceErrors, type PlaceInput } from '@/data/placeForm';
 import { usePlaces } from '@/data/placesStore';
 import { sectorsOf } from '@/data/sectors';
 import type { Place } from '@/data/types';
@@ -39,6 +40,11 @@ export function PlaceForm({ initial, onSubmit, submitLabel = 'Guardar' }: {
 
   const setImageUrl = (text: string) => set('image', text === '' && localImage !== undefined ? localImage : text);
 
+  const pickImage = async () => {
+    const uri = await pickImageFromGallery();
+    if (uri) set('image', uri);
+  };
+
   const submit = () => {
     const found = validatePlace(draft);
     setErrors(found);
@@ -47,7 +53,7 @@ export function PlaceForm({ initial, onSubmit, submitLabel = 'Guardar' }: {
   };
 
   const hasErrors = Object.values(errors).some(Boolean);
-  const preview = typeof draft.image === 'number' ? draft.image : /^https:\/\/\S+$/.test(draft.image.trim()) ? { uri: draft.image.trim() } : null;
+  const preview = typeof draft.image === 'number' ? draft.image : isImageUri(draft.image) ? { uri: draft.image.trim() } : null;
 
   return (
     <View style={{ gap: spacing.lg }}>
@@ -96,7 +102,7 @@ export function PlaceForm({ initial, onSubmit, submitLabel = 'Guardar' }: {
 
       <View style={styles.group}>
         <TextField
-          label="URL de imagen"
+          label="Imagen (URL o galería)"
           value={typeof draft.image === 'string' ? draft.image : ''}
           onChangeText={setImageUrl}
           error={errors.image}
@@ -106,6 +112,7 @@ export function PlaceForm({ initial, onSubmit, submitLabel = 'Guardar' }: {
           autoCorrect={false}
           placeholder="https://…"
         />
+        <Button label="Elegir de la galería" icon="images-outline" variant="outline" onPress={pickImage} />
         {preview ? (
           <Image source={preview} accessibilityLabel="Vista previa de la imagen" style={styles.preview} />
         ) : null}

@@ -12,7 +12,7 @@ export interface PlaceDraft {
   phone: string;
   lat: string;
   lng: string;
-  image: Place['image']; // URL https:// o imagen local ya incluida en la app (require)
+  image: Place['image']; // URL https://, foto de la galería (file://) o imagen incluida en la app (require)
 }
 
 export type PlaceErrors = Partial<Record<keyof PlaceDraft, string>>;
@@ -47,6 +47,9 @@ export function parseCoordinate(value: string): number | null {
 
 const REQUIRED = 'Este campo es obligatorio.';
 
+// URL web (https://) o foto elegida desde la galería del teléfono (file://).
+export const isImageUri = (value: string): boolean => /^(https|file):\/\/\S+$/.test(value.trim());
+
 export function validatePlace(draft: PlaceDraft): PlaceErrors {
   const errors: PlaceErrors = {};
 
@@ -71,7 +74,7 @@ export function validatePlace(draft: PlaceDraft): PlaceErrors {
   if (typeof draft.image === 'string') {
     const image = draft.image.trim();
     if (!image) errors.image = REQUIRED;
-    else if (!/^https:\/\/\S+$/.test(image)) errors.image = 'La imagen debe ser una URL que empiece con https://';
+    else if (!isImageUri(image)) errors.image = 'La imagen debe ser una URL que empiece con https:// o una foto de la galería.';
   }
 
   return errors;

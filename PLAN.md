@@ -155,7 +155,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 
 **Parte C — Integración y pruebas**
 - [ ] **11.13** Comprobar que los cambios se reflejan sin reiniciar en: Inicio, Explorar (búsqueda), Listado de categoría, Detalle, Mapa (marcadores y chips de sector) y que un sector nuevo creado con "Otro" aparece en los filtros.
-- [ ] **11.14** *(opcional)* Elegir foto desde la galería con `npx expo install expo-image-picker` (pedir permiso solo al tocar el botón; manejar permiso denegado). Guardar el `uri` local en `image`.
+- [x] **11.14** *(opcional)* Elegir foto desde la galería con `npx expo install expo-image-picker` (pedir permiso solo al tocar el botón; manejar permiso denegado). Guardar el `uri` local en `image`.
 - [ ] **11.15** Recorridos de prueba (anotar resultados):
   1. Admin → Agregar restaurante en Achao → aparece en Gastronomía, en Explorar y en el Mapa.
   2. Admin → Editar teléfono de un punto de emergencia → el botón "Llamar" del Detalle usa el nuevo número.
