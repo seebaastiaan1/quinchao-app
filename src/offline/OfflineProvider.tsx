@@ -1,7 +1,8 @@
 import NetInfo from '@react-native-community/netinfo';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { ImageSourcePropType } from 'react-native';
-import { OFFLINE_VERSION, offlineImages } from '@/data/offline';
+import { OFFLINE_VERSION, isRemoteImage, offlineImages } from '@/data/offline';
+import { usePlaces } from '@/data/placesStore';
 import { downloadPack, loadManifest, localUri, offlineSupported, removePack } from './storage';
 import type { OfflineManifest } from './types';
 
@@ -28,10 +29,12 @@ interface OfflineContextValue {
 
 const OfflineContext = createContext<OfflineContextValue | null>(null);
 
-const isComplete = (manifest: OfflineManifest): boolean =>
-  manifest.version === OFFLINE_VERSION && offlineImages().every((url) => url in manifest.files);
+const isComplete = (manifest: OfflineManifest, urls: string[]): boolean =>
+  manifest.version === OFFLINE_VERSION && urls.every((url) => url in manifest.files);
 
 export function OfflineProvider({ children }: { children: ReactNode }) {
+  const { places } = usePlaces();
+  const urls = useMemo(() => offlineImages(places), [places]);
   const [isOnline, setIsOnline] = useState(true);
   const [onWifi, setOnWifi] = useState(false);
   const [manifest, setManifest] = useState<OfflineManifest | null>(null);
@@ -64,7 +67,6 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
       setMessage('Necesitas conexión a internet para descargar el contenido.');
       return;
     }
-    const urls = offlineImages();
     setDownloading(true);
     setMessage(null);
     setProgress({ done: 0, total: urls.length });
@@ -81,7 +83,7 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
     } finally {
       setDownloading(false);
     }
-  }, [downloading, isOnline]);
+  }, [downloading, isOnline, urls]);
 
   const remove = useCallback(async () => {
     if (downloading) return;
@@ -94,7 +96,7 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
     }
   }, [downloading]);
 
-  const status: OfflineStatus = !checked ? 'checking' : downloading ? 'downloading' : !manifest ? 'none' : isComplete(manifest) ? 'ready' : 'outdated';
+  const status: OfflineStatus = !checked ? 'checking' : downloading ? 'downloading' : !manifest ? 'none' : isComplete(manifest, urls) ? 'ready' : 'outdated';
 
   // Descarga automática solo con Wi-Fi (una vez por sesión), para no gastar los datos móviles del usuario.
   // Con datos móviles la descarga se inicia a mano desde la pestaña Información.
@@ -117,9 +119,10 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
       remove,
       imageSource: (image) => {
         if (typeof image !== 'string') return image;
+        if (!isRemoteImage(image)) return { uri: image };
         return { uri: localUri(manifest, image) ?? image };
       },
-      hasLocalCopy: (image) => typeof image !== 'string' || localUri(manifest, image) !== null,
+      hasLocalCopy: (image) => !isRemoteImage(image) || localUri(manifest, image) !== null,
     }),
     [isOnline, status, progress, manifest, message, download, remove],
   );

@@ -1,7 +1,9 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Alert, Linking } from 'react-native';
+import { persistPhoto } from './photoStorage';
 
-// Abre la galería y devuelve el uri local de la foto elegida (null si se cancela o no hay permiso).
+// Abre la galería y devuelve el uri local de la foto elegida, ya copiada a la carpeta de la app
+// (null si se cancela o no hay permiso).
 // El permiso se pide solo al tocar el botón.
 export async function pickImageFromGallery(): Promise<string | null> {
   const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -25,5 +27,6 @@ export async function pickImageFromGallery(): Promise<string | null> {
     aspect: [16, 9],
     quality: 0.7,
   });
-  return result.canceled ? null : result.assets[0]?.uri ?? null;
+  const uri = result.canceled ? undefined : result.assets[0]?.uri;
+  return uri ? persistPhoto(uri) : null;
 }
