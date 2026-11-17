@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { FlatList, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { categories } from '@/data/categories';
 import type { CategoryFilter } from '@/data/map';
-import { sectors } from '@/data/sectors';
+import { usePlaces } from '@/data/placesStore';
+import { sectorsOf } from '@/data/sectors';
 import type { Place } from '@/data/types';
 import { colors, radius, shadow, spacing } from '@/theme';
 import { AppText } from './AppText';
@@ -18,6 +19,8 @@ export function MapFilters({ filter, sector, count, onCategory, onSector, style 
   onSector: (s: string | null) => void;
   style?: StyleProp<ViewStyle>;
 }) {
+  const { places } = usePlaces();
+  const sectors = useMemo(() => sectorsOf(places), [places]);
   return (
     <View style={[styles.panel, style]}>
       <AppText variant="eyebrow">Mapa de Quinchao</AppText>

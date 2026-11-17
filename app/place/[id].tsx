@@ -3,13 +3,17 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image, Pressable, View } from 'react-native';
 import { AppText, Button, Screen } from '@/components';
 import { callPlace, openDirections } from '@/data/actions';
-import { getPlace } from '@/data/places';
+import { usePlace, usePlaces } from '@/data/placesStore';
 import { colors, radius, spacing } from '@/theme';
 
 export default function PlaceScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const place = getPlace(id);
+  const { ready } = usePlaces();
+  const place = usePlace(id);
+
+  // Mientras se leen los datos guardados, un lugar recién creado todavía no aparece.
+  if (!place && !ready) return <Screen>{null}</Screen>;
 
   if (!place) {
     return (

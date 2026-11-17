@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { PlacesProvider } from '@/data/placesStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,12 +19,14 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="category/[key]" />
-        <Stack.Screen name="place/[id]" />
-      </Stack>
+      <PlacesProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="category/[key]" />
+          <Stack.Screen name="place/[id]" />
+        </Stack>
+      </PlacesProvider>
     </SafeAreaProvider>
   );
 }

@@ -2,7 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { getCategory } from '@/data/categories';
 import { boundsOf, filterByCategory, filterBySector, isInside, type Bounds, type CategoryFilter } from '@/data/map';
-import { getPlace } from '@/data/places';
+import { usePlace, usePlaces } from '@/data/placesStore';
 import type { Place } from '@/data/types';
 
 // Acciones sobre el mapa que implementa cada plataforma (react-native-maps o Leaflet).
@@ -19,7 +19,8 @@ const filterFor = (place: Place, current: CategoryFilter): CategoryFilter =>
 export function useMapScreen(controls: MapControls) {
   const params = useLocalSearchParams<{ focus?: string; category?: string }>();
   const paramCategory = params.category ? getCategory(params.category)?.key : undefined;
-  const focusPlace = params.focus ? getPlace(params.focus) : undefined;
+  const { places } = usePlaces();
+  const focusPlace = usePlace(params.focus);
 
   const [filter, setFilter] = useState<CategoryFilter>(() => {
     const initial = paramCategory ?? 'todo';
@@ -32,14 +33,14 @@ export function useMapScreen(controls: MapControls) {
   // Vista con la que se abre el mapa (antes de que exista la instancia para animarlo)
   const [initialView] = useState(() => ({
     place: focusPlace,
-    bounds: paramCategory ? boundsOf(filterByCategory(paramCategory)) : null,
+    bounds: paramCategory ? boundsOf(filterByCategory(places, paramCategory)) : null,
   }));
 
-  const filtered = useMemo(() => filterByCategory(filter), [filter]);
+  const filtered = useMemo(() => filterByCategory(places, filter), [places, filter]);
   const visible = useMemo(() => (viewBounds ? filtered.filter((p) => isInside(viewBounds, p)) : filtered), [filtered, viewBounds]);
 
   const frameFor = (c: CategoryFilter, s: string | null) =>
-    controls.frame(s === null && c === 'todo' ? null : boundsOf(filterBySector(filterByCategory(c), s)));
+    controls.frame(s === null && c === 'todo' ? null : boundsOf(filterBySector(filterByCategory(places, c), s)));
 
   const selectCategory = (c: CategoryFilter) => {
     setFilter(c);
@@ -62,7 +63,7 @@ export function useMapScreen(controls: MapControls) {
     if (!paramCategory) return;
     setFilter(paramCategory);
     setSector(null);
-    controls.frame(boundsOf(filterByCategory(paramCategory)));
+    controls.frame(boundsOf(filterByCategory(places, paramCategory)));
   }, [paramCategory]);
 
   useEffect(() => {

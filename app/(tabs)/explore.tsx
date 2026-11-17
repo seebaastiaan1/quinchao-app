@@ -4,12 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { CategoryRow, EmptyState, PlaceCard, Screen, SectionHeader } from '@/components';
 import { categories } from '@/data/categories';
-import { places } from '@/data/places';
+import { usePlaces } from '@/data/placesStore';
 import { colors, fonts, radius, spacing } from '@/theme';
 
 export default function ExploreScreen() {
   const router = useRouter();
   const { q } = useLocalSearchParams<{ q?: string }>();
+  const { places } = usePlaces();
   const [query, setQuery] = useState(q ?? '');
 
   useEffect(() => setQuery(q ?? ''), [q]);
@@ -18,7 +19,7 @@ export default function ExploreScreen() {
     const text = query.trim().toLowerCase();
     if (!text) return [];
     return places.filter((p) => [p.title, p.area, p.tag, p.description].some((s) => s.toLowerCase().includes(text)));
-  }, [query]);
+  }, [places, query]);
 
   return (
     <Screen>

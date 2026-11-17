@@ -4,12 +4,13 @@ import { Pressable, View } from 'react-native';
 import { AppText, Button, EmptyState, PlaceCard, Screen, SectionHeader } from '@/components';
 import { callPlace } from '@/data/actions';
 import { getCategory } from '@/data/categories';
-import { placesByCategory } from '@/data/places';
+import { usePlaces } from '@/data/placesStore';
 import { colors, spacing } from '@/theme';
 
 export default function CategoryScreen() {
   const router = useRouter();
   const { key } = useLocalSearchParams<{ key: string }>();
+  const { places } = usePlaces();
   const category = getCategory(key);
 
   if (!category) {
@@ -21,7 +22,7 @@ export default function CategoryScreen() {
     );
   }
 
-  const items = placesByCategory(category.key);
+  const items = places.filter((p) => p.category === category.key);
 
   return (
     <Screen>

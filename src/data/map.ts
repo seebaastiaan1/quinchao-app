@@ -1,4 +1,3 @@
-import { places } from './places';
 import type { CategoryKey, Place } from './types';
 
 // Lógica del mapa compartida entre map.tsx (react-native-maps) y map.web.tsx (Leaflet).
@@ -14,7 +13,7 @@ export interface Bounds {
 // Centro aproximado de la isla Quinchao (vista inicial)
 export const ISLAND_CENTER = { lat: -42.45, lng: -73.47 };
 
-export const filterByCategory = (category: CategoryFilter): Place[] => (category === 'todo' ? places : places.filter((p) => p.category === category));
+export const filterByCategory = (list: Place[], category: CategoryFilter): Place[] => (category === 'todo' ? list : list.filter((p) => p.category === category));
 export const filterBySector = (list: Place[], sector: string | null): Place[] => (sector ? list.filter((p) => p.area === sector) : list);
 
 export function boundsOf(list: Place[]): Bounds | null {
