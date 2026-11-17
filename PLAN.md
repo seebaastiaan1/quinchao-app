@@ -17,6 +17,8 @@ app/                      # rutas (Expo Router)
     index.tsx  explore.tsx  map.tsx  info.tsx
   category/[key].tsx      # Listado de una categoría (pantallas 3–7 del inventario)
   place/[id].tsx          # Detalle + Contacto (pantallas 8 y 10)
+  admin/                  # Fase 11: gestión de contenido (crear / editar / eliminar lugares)
+    index.tsx  new.tsx  edit/[id].tsx
 src/
   theme/index.ts          # colores, espaciado, tipografía
   data/                   # types, categories, places, actions (llamar / cómo llegar)
@@ -26,8 +28,8 @@ src/
 
 ## 3. Decisiones y puntos abiertos (revisar con el docente/cliente)
 - **Alcance v1:** sin servidor. Datos locales en `src/data`. Quedan fuera: sincronización, creación de rutas, tablero de noticias.
-- **RF-04 (Administrador)** exige agregar/modificar/eliminar contenido → requiere backend; **se pospone a v2**. En v1 el contenido se edita en `src/data`.
-- **RNF-03 (autenticación)** no aplica mientras no exista el rol Administrador; en v1 no hay login.
+- **RF-04 (Administrador)** exige agregar/modificar/eliminar contenido. Se implementa en la **Fase 11** en versión **local**: los cambios se guardan en el teléfono (AsyncStorage) y solo los ve ese dispositivo. Para que los cambios lleguen a todos los usuarios hace falta un backend (v2); por eso toda la lectura/escritura pasa por un único módulo (`src/data/placesStore.tsx`) que después se podrá conectar a un servidor sin tocar las pantallas.
+- **RNF-03 (autenticación)**: en la Fase 11 se usa un **PIN local** solo para que un visitante no entre por accidente al modo administración. **No es seguridad real** (el PIN queda dentro de la app); la autenticación de verdad llega con el backend en v2.
 - **Reportes de problemas** (calles, basura, luminarias) aparecen en el objetivo del documento pero **no tienen pantalla** ni requerimiento. Pendiente: pregunta 3 al cliente.
 - **Qué es "emergencia"** (pregunta 1 al cliente): hasta tener respuesta se usan 131 Salud, 132 Bomberos, 133 Carabineros, 137 Capitanía.
 - **Imágenes:** las de Unsplash son temporales; el documento exige imágenes autorizadas por la municipalidad.
@@ -120,6 +122,47 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
   2. Inicio → Reciclaje → Detalle → Mapa.
 - [ ] **10.5** Revisión final: `npm run typecheck`, `npx expo-doctor`, revisar textos (ortografía) y retirar los `TODO(equipo)` pendientes.
 - [ ] **10.6** *(opcional)* Build de prueba con EAS (`npx eas build --profile preview`) para instalar un APK sin Expo Go.
+
+### Fase 11 — Gestión de contenido: crear, editar y eliminar lugares (RF-04)
+> Permite al administrador municipal **agregar, modificar y eliminar** restaurantes, hoteles y hospedajes, experiencias, puntos de emergencia y puntos de reciclaje (todas las categorías de `categories.ts`) desde la propia app.
+> **Alcance:** los cambios se guardan **en el dispositivo** (ver sección 3, RF-04). Los datos de `src/data/places.ts` pasan a ser los **datos iniciales**; la app lee siempre desde el *store*.
+> Hacer las tareas **en orden**: 11.1 → 11.4 dejan la app funcionando igual que antes; las pantallas de administración empiezan en 11.5.
+
+**Parte A — Capa de datos (archivos: `src/data/*`, `app/_layout.tsx`)**
+- [x] **11.1** Instalar almacenamiento local: `npx expo install @react-native-async-storage/async-storage`. *Verificación:* aparece en `package.json` y `npx expo start` abre sin errores.
+- [ ] **11.2** Crear `src/data/placesStore.tsx` con un `PlacesProvider` (React Context) y los hooks `usePlaces()` y `usePlace(id)`.
+  - Estado inicial = `places` de `places.ts`. Al montar, leer la clave `quinchao:places:v1` de AsyncStorage; si existe, usar esa lista.
+  - Funciones expuestas: `addPlace(place)`, `updatePlace(id, cambios)`, `removePlace(id)`, `resetPlaces()` (vuelve a los datos iniciales y borra la clave).
+  - Cada cambio guarda la lista completa en AsyncStorage. Exponer también `ready: boolean` (true cuando terminó de leer).
+  - Si la lectura falla o el JSON es inválido: usar los datos iniciales y no romper la app.
+  *Verificación:* typecheck sin errores; sin `any`.
+- [ ] **11.3** Crear `src/data/placeForm.ts` con: `slugify(title)` (minúsculas, sin tildes, guiones), `uniqueId(title, existentes)` (agrega `-2`, `-3`… si el id ya existe) y `validatePlace(borrador)` que devuelva un objeto de errores por campo. Reglas: `title`, `category`, `area`, `tag`, `note`, `description` obligatorios; `lat` entre −90 y 90 y `lng` entre −180 y 180 (números); `phone` opcional, solo dígitos, `+` y espacios; `image` obligatoria (URL `https://…`). Mensajes en español.
+- [ ] **11.4** Envolver la app con `<PlacesProvider>` en `app/_layout.tsx` (dentro de `SafeAreaProvider`) y migrar las pantallas para que lean del store en vez de importar `places` directo:
+  - `category/[key].tsx` y `place/[id].tsx` → `usePlaces()` / `usePlace(id)`.
+  - `(tabs)/explore.tsx` → `usePlaces()`.
+  - `src/data/map.ts`: `filterByCategory(list, category)` recibe la lista por parámetro; `useMapScreen.ts` la obtiene con `usePlaces()`. Igual para `sectors.ts` → función `sectorsOf(list)`.
+  *Verificación:* `grep -rn "from '@/data/places'" app src/components` solo devuelve `photos` (o nada). La app se ve **igual que antes**.
+
+**Parte B — Pantallas de administración (archivos: `app/admin/*`, `src/components/*`)**
+- [ ] **11.5** Acceso: en `(tabs)/info.tsx` agregar al final un enlace discreto "Administrar contenido" que abre `/admin`. Crear `src/data/admin.ts` con `ADMIN_PIN` (`// TODO(equipo): definir el PIN con la municipalidad`) y, en `app/admin/index.tsx`, pedir el PIN antes de mostrar nada. Recordar el desbloqueo solo mientras la app esté abierta (estado en el `PlacesProvider` o un contexto propio, **no** en AsyncStorage). Registrar las rutas `admin/index`, `admin/new` y `admin/edit/[id]` en el `Stack` de `app/_layout.tsx`.
+- [ ] **11.6** Crear `src/components/TextField.tsx` (etiqueta + `TextInput` + mensaje de error), con estilos solo de `src/theme`, fuente Poppins, `accessibilityLabel` igual a la etiqueta y alto mínimo 44. Exportarlo en `src/components/index.ts`.
+- [ ] **11.7** Pantalla `app/admin/index.tsx` (después del PIN): `SectionHeader` "Administración", fila de `Pill` por categoría ("Todas", "Gastronomía", "Hoteles y hospedajes", "Experiencias", "Servicios y emergencias", "Reciclaje"), botón "Agregar lugar" y lista (`FlatList`) con cada lugar: título, categoría, sector y dos botones **Editar** / **Eliminar**. Usar `EmptyState` si el filtro no tiene lugares.
+- [ ] **11.8** Crear `src/components/PlaceForm.tsx` reutilizable (lo usan crear y editar). Campos: categoría (`Pill`), nombre, sector (`Pill` con los sectores existentes + opción "Otro" que muestra un `TextField`), etiqueta, horario/dato corto (`note`), descripción (multilínea), dirección, teléfono (teclado `phone-pad`), latitud y longitud (teclado numérico, aceptar coma o punto decimal), URL de imagen. Botón "Guardar" que valida con `validatePlace` y muestra los errores bajo cada campo. Props: `initial?`, `onSubmit(place)`.
+- [ ] **11.9** Pantalla `app/admin/new.tsx`: usa `PlaceForm`; acepta el parámetro opcional `category` para dejarla preseleccionada. Al guardar: `uniqueId` + `addPlace`, mensaje "Lugar agregado" y volver a `/admin`.
+- [ ] **11.10** Pantalla `app/admin/edit/[id].tsx`: carga el lugar con `usePlace(id)` (si no existe → `EmptyState` + "Volver"); usa `PlaceForm` con `initial`. El `id` **no cambia** al editar el nombre (para no romper enlaces). Al guardar: `updatePlace` y volver.
+- [ ] **11.11** Eliminar: en la lista y en la pantalla de edición, confirmar con `Alert` ("¿Eliminar *Nombre*? Esta acción no se puede deshacer."). Si la categoría es `emergencias`, agregar una segunda advertencia indicando que es un servicio de emergencia. Al eliminar desde la pantalla de edición, volver a `/admin`.
+- [ ] **11.12** Botón "Restaurar datos originales" al final de `app/admin/index.tsx`, con confirmación `Alert`, que llama a `resetPlaces()`.
+
+**Parte C — Integración y pruebas**
+- [ ] **11.13** Comprobar que los cambios se reflejan sin reiniciar en: Inicio, Explorar (búsqueda), Listado de categoría, Detalle, Mapa (marcadores y chips de sector) y que un sector nuevo creado con "Otro" aparece en los filtros.
+- [ ] **11.14** *(opcional)* Elegir foto desde la galería con `npx expo install expo-image-picker` (pedir permiso solo al tocar el botón; manejar permiso denegado). Guardar el `uri` local en `image`.
+- [ ] **11.15** Recorridos de prueba (anotar resultados):
+  1. Admin → Agregar restaurante en Achao → aparece en Gastronomía, en Explorar y en el Mapa.
+  2. Admin → Editar teléfono de un punto de emergencia → el botón "Llamar" del Detalle usa el nuevo número.
+  3. Admin → Eliminar un punto de reciclaje → desaparece del Listado y del Mapa.
+  4. Cerrar y volver a abrir la app en Expo Go → los cambios siguen ahí.
+  5. Restaurar datos originales → vuelve la lista de `places.ts`.
+  *Verificación final:* `npm run typecheck` sin errores y `npx expo-doctor` sin errores críticos.
 
 ## 6. Definición de "terminado" para una tarea
 - Compila y se ve bien en Expo Go (Android y/o iOS).
