@@ -130,7 +130,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 
 **Parte A — Capa de datos (archivos: `src/data/*`, `app/_layout.tsx`)**
 - [x] **11.1** Instalar almacenamiento local: `npx expo install @react-native-async-storage/async-storage`. *Verificación:* aparece en `package.json` y `npx expo start` abre sin errores.
-- [ ] **11.2** Crear `src/data/placesStore.tsx` con un `PlacesProvider` (React Context) y los hooks `usePlaces()` y `usePlace(id)`.
+- [x] **11.2** Crear `src/data/placesStore.tsx` con un `PlacesProvider` (React Context) y los hooks `usePlaces()` y `usePlace(id)`.
   - Estado inicial = `places` de `places.ts`. Al montar, leer la clave `quinchao:places:v1` de AsyncStorage; si existe, usar esa lista.
   - Funciones expuestas: `addPlace(place)`, `updatePlace(id, cambios)`, `removePlace(id)`, `resetPlaces()` (vuelve a los datos iniciales y borra la clave).
   - Cada cambio guarda la lista completa en AsyncStorage. Exponer también `ready: boolean` (true cuando terminó de leer).
