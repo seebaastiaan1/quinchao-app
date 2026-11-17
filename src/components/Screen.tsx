@@ -10,6 +10,8 @@ export function Screen({ children, style, topInset = true }: { children: ReactNo
       style={{ flex: 1, backgroundColor: colors.paper }}
       contentContainerStyle={[{ paddingTop: topInset ? insets.top + spacing.lg : 0, paddingBottom: spacing.xxl, paddingHorizontal: spacing.lg, gap: spacing.lg }, style]}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
     >
       {children}
     </ScrollView>

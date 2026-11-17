@@ -76,3 +76,47 @@ export function validatePlace(draft: PlaceDraft): PlaceErrors {
 
   return errors;
 }
+
+// Lugar sin id: el id lo asigna la pantalla "Agregar" (uniqueId) y no cambia al editar.
+export type PlaceInput = Omit<Place, 'id'>;
+
+const coordinateText = (n: number | undefined) => (n === undefined ? '' : String(n).replace('.', ','));
+
+export function placeToDraft(initial?: Partial<Place>): PlaceDraft {
+  return {
+    category: initial?.category ?? '',
+    title: initial?.title ?? '',
+    area: initial?.area ?? '',
+    tag: initial?.tag ?? '',
+    note: initial?.note ?? '',
+    description: initial?.description ?? '',
+    address: initial?.address ?? '',
+    phone: initial?.phone ?? '',
+    lat: coordinateText(initial?.lat),
+    lng: coordinateText(initial?.lng),
+    image: initial?.image ?? '',
+  };
+}
+
+// Devuelve null si el borrador no pasa validatePlace.
+export function draftToPlace(draft: PlaceDraft): PlaceInput | null {
+  const lat = parseCoordinate(draft.lat);
+  const lng = parseCoordinate(draft.lng);
+  if (!draft.category || lat === null || lng === null) return null;
+  if (Object.keys(validatePlace(draft)).length > 0) return null;
+  const address = draft.address.trim();
+  const phone = draft.phone.trim();
+  return {
+    category: draft.category,
+    title: draft.title.trim(),
+    area: draft.area.trim(),
+    tag: draft.tag.trim(),
+    note: draft.note.trim(),
+    description: draft.description.trim(),
+    address: address || undefined,
+    phone: phone || undefined,
+    lat,
+    lng,
+    image: typeof draft.image === 'string' ? draft.image.trim() : draft.image,
+  };
+}

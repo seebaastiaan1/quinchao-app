@@ -5,6 +5,7 @@ export { AdminGate } from './AdminGate';
 export { EmptyState } from './EmptyState';
 export { Pill } from './Pill';
 export { PlaceCard } from './PlaceCard';
+export { PlaceForm } from './PlaceForm';
 export { SectionHeader } from './SectionHeader';
 export { TextField } from './TextField';
 export { Screen, Row } from './Screen';
