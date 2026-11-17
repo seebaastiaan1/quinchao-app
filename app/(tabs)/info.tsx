@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AppText, Button, Screen } from '@/components';
 import type { IconName } from '@/data/types';
 import { colors, radius, spacing } from '@/theme';
@@ -36,6 +36,17 @@ export default function InfoScreen() {
       ))}
 
       <Button label="Ver contactos de emergencia" icon="call-outline" variant="danger" onPress={() => router.push({ pathname: '/category/[key]', params: { key: 'emergencias' } })} />
+
+      {/* Acceso discreto al modo administración (RF-04), protegido con PIN */}
+      <Pressable
+        onPress={() => router.push('/admin')}
+        accessibilityRole="link"
+        accessibilityLabel="Administrar contenido"
+        style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs }}
+      >
+        <Ionicons name="settings-outline" size={14} color={colors.muted} />
+        <AppText variant="small">Administrar contenido</AppText>
+      </Pressable>
     </Screen>
   );
 }

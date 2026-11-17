@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AdminSessionProvider } from '@/data/adminSession';
 import { PlacesProvider } from '@/data/placesStore';
 
 SplashScreen.preventAutoHideAsync();
@@ -20,12 +21,17 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PlacesProvider>
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="category/[key]" />
-          <Stack.Screen name="place/[id]" />
-        </Stack>
+        <AdminSessionProvider>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="category/[key]" />
+            <Stack.Screen name="place/[id]" />
+            <Stack.Screen name="admin/index" />
+            <Stack.Screen name="admin/new" />
+            <Stack.Screen name="admin/edit/[id]" />
+          </Stack>
+        </AdminSessionProvider>
       </PlacesProvider>
     </SafeAreaProvider>
   );
