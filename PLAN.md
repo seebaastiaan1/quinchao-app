@@ -136,7 +136,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
   - Cada cambio guarda la lista completa en AsyncStorage. Exponer también `ready: boolean` (true cuando terminó de leer).
   - Si la lectura falla o el JSON es inválido: usar los datos iniciales y no romper la app.
   *Verificación:* typecheck sin errores; sin `any`.
-- [ ] **11.3** Crear `src/data/placeForm.ts` con: `slugify(title)` (minúsculas, sin tildes, guiones), `uniqueId(title, existentes)` (agrega `-2`, `-3`… si el id ya existe) y `validatePlace(borrador)` que devuelva un objeto de errores por campo. Reglas: `title`, `category`, `area`, `tag`, `note`, `description` obligatorios; `lat` entre −90 y 90 y `lng` entre −180 y 180 (números); `phone` opcional, solo dígitos, `+` y espacios; `image` obligatoria (URL `https://…`). Mensajes en español.
+- [x] **11.3** Crear `src/data/placeForm.ts` con: `slugify(title)` (minúsculas, sin tildes, guiones), `uniqueId(title, existentes)` (agrega `-2`, `-3`… si el id ya existe) y `validatePlace(borrador)` que devuelva un objeto de errores por campo. Reglas: `title`, `category`, `area`, `tag`, `note`, `description` obligatorios; `lat` entre −90 y 90 y `lng` entre −180 y 180 (números); `phone` opcional, solo dígitos, `+` y espacios; `image` obligatoria (URL `https://…`). Mensajes en español.
 - [ ] **11.4** Envolver la app con `<PlacesProvider>` en `app/_layout.tsx` (dentro de `SafeAreaProvider`) y migrar las pantallas para que lean del store en vez de importar `places` directo:
   - `category/[key].tsx` y `place/[id].tsx` → `usePlaces()` / `usePlace(id)`.
   - `(tabs)/explore.tsx` → `usePlaces()`.
