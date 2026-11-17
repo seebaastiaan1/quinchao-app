@@ -1,15 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { colors, radius, shadow, spacing } from '@/theme';
 import type { Place } from '@/data/types';
 import { AppText } from './AppText';
+import { PlaceImage } from './PlaceImage';
 
 export function PlaceCard({ place, onPress }: { place: Place; onPress: () => void }) {
   const isEmergency = place.category === 'emergencias';
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={place.title} style={({ pressed }) => [styles.card, pressed && { opacity: 0.9 }]}>
       <View>
-        <Image source={typeof place.image === 'string' ? { uri: place.image } : place.image} style={styles.image} />
+        <PlaceImage image={place.image} style={styles.image} />
         <View style={styles.tag}>
           <AppText variant="small" style={{ color: colors.navy }}>{place.tag}</AppText>
         </View>

@@ -8,6 +8,7 @@ import { AppText, MapCardList, MapFilters, useMapScreen } from '@/components';
 import { categoryColor } from '@/data/categories';
 import { ISLAND_CENTER, type Bounds } from '@/data/map';
 import type { Place } from '@/data/types';
+import { useOffline } from '@/offline';
 import { colors, fonts, spacing } from '@/theme';
 
 // Versión web del mapa (Leaflet + OpenStreetMap, sin API key). react-native-maps no funciona en navegador.
@@ -49,6 +50,7 @@ function ViewportTracker({ onChange }: { onChange: (b: Bounds) => void }) {
 export default function MapScreen() {
   const router = useRouter();
   const mapRef = useRef<L.Map>(null);
+  const { isOnline } = useOffline();
   const map = useMapScreen({
     frame: (b) => {
       if (b) mapRef.current?.fitBounds(toLatLngBounds(b), FIT_OPTIONS);
@@ -98,6 +100,7 @@ export default function MapScreen() {
         filter={map.filter}
         sector={map.sector}
         count={map.visible.length}
+        notice={isOnline ? undefined : 'Sin conexión: el mapa de fondo puede no cargarse. Los lugares y sus fichas siguen disponibles.'}
         onCategory={map.selectCategory}
         onSector={map.selectSector}
         style={styles.top}
