@@ -5,6 +5,7 @@ export { EmptyState } from './EmptyState';
 export { Pill } from './Pill';
 export { PlaceCard } from './PlaceCard';
 export { SectionHeader } from './SectionHeader';
+export { TextField } from './TextField';
 export { Screen, Row } from './Screen';
 export { MapCard } from './MapCard';
 export { MapCardList, MapFilters } from './MapPanels';
