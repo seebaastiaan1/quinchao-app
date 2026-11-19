@@ -7,6 +7,7 @@ import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaf
 import { AppText, MapCardList, MapFilters, useMapScreen } from '@/components';
 import { categoryColor } from '@/data/categories';
 import { ISLAND_CENTER, type Bounds } from '@/data/map';
+import { hasValidLocation } from '@/data/availability';
 import type { Place } from '@/data/types';
 import { useOffline } from '@/offline';
 import { colors, fonts, spacing } from '@/theme';
@@ -56,11 +57,13 @@ export default function MapScreen() {
       if (b) mapRef.current?.fitBounds(toLatLngBounds(b), FIT_OPTIONS);
       else mapRef.current?.flyTo(INITIAL_CENTER, INITIAL_ZOOM);
     },
-    center: (p) => mapRef.current?.flyTo([p.lat, p.lng], FOCUS_ZOOM),
+    center: (p) => {
+      if (hasValidLocation(p)) mapRef.current?.flyTo([p.lat, p.lng], FOCUS_ZOOM);
+    },
   });
   const [initialView] = useState(() => {
     const { place, bounds } = map.initialView;
-    if (place) return { center: [place.lat, place.lng] as L.LatLngTuple, zoom: FOCUS_ZOOM };
+    if (place && hasValidLocation(place)) return { center: [place.lat, place.lng] as L.LatLngTuple, zoom: FOCUS_ZOOM };
     return bounds ? { bounds: toLatLngBounds(bounds), boundsOptions: FIT_OPTIONS } : { center: INITIAL_CENTER, zoom: INITIAL_ZOOM };
   });
 
@@ -75,24 +78,27 @@ export default function MapScreen() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <ViewportTracker onChange={map.setViewBounds} />
-          {map.visible.map((p) => (
-            <Marker
-              key={p.id}
-              position={[p.lat, p.lng]}
-              icon={markerIcon(categoryColor(p.category), p.id === map.selectedId)}
-              eventHandlers={{ click: () => map.selectPlace(p) }}
-            >
-              <Popup autoPan={false}>
-                <View style={styles.popup}>
-                  <AppText variant="heading" style={{ fontSize: 15 }}>{p.title}</AppText>
-                  <AppText variant="small">{p.note}</AppText>
-                  <Link href={{ pathname: '/place/[id]', params: { id: p.id } }} accessibilityLabel={`Ver ficha de ${p.title}`} style={styles.popupLink}>
-                    Ver ficha
-                  </Link>
-                </View>
-              </Popup>
-            </Marker>
-          ))}
+          {map.visible.map((p) => {
+            if (!hasValidLocation(p)) return null;
+            return (
+              <Marker
+                key={p.id}
+                position={[p.lat, p.lng]}
+                icon={markerIcon(categoryColor(p.category), p.id === map.selectedId)}
+                eventHandlers={{ click: () => map.selectPlace(p) }}
+              >
+                <Popup autoPan={false}>
+                  <View style={styles.popup}>
+                    <AppText variant="heading" style={{ fontSize: 15 }}>{p.title}</AppText>
+                    <AppText variant="small">{p.note}</AppText>
+                    <Link href={{ pathname: '/place/[id]', params: { id: p.id } }} accessibilityLabel={`Ver ficha de ${p.title}`} style={styles.popupLink}>
+                      Ver ficha
+                    </Link>
+                  </View>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </View>
 

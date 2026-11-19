@@ -22,7 +22,8 @@ const PlacesContext = createContext<PlacesContextValue | null>(null);
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
-const isOptionalString = (value: unknown) => value === undefined || typeof value === 'string';
+const isOptionalString = (value: unknown) => value === undefined || value === null || typeof value === 'string';
+const isOptionalCoordinate = (value: unknown) => value === undefined || value === null || typeof value === 'number';
 
 function isPlace(value: unknown): value is Place {
   if (!isRecord(value)) return false;
@@ -33,13 +34,13 @@ function isPlace(value: unknown): value is Place {
     typeof value.title === 'string' &&
     typeof value.area === 'string' &&
     typeof value.tag === 'string' &&
-    (typeof value.image === 'string' || typeof value.image === 'number') &&
-    typeof value.note === 'string' &&
-    typeof value.description === 'string' &&
+    (value.image === undefined || value.image === null || typeof value.image === 'string' || typeof value.image === 'number') &&
+    isOptionalString(value.note) &&
+    isOptionalString(value.description) &&
     isOptionalString(value.address) &&
     isOptionalString(value.phone) &&
-    typeof value.lat === 'number' &&
-    typeof value.lng === 'number'
+    isOptionalCoordinate(value.lat) &&
+    isOptionalCoordinate(value.lng)
   );
 }
 

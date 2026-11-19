@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { CategoryRow, EmptyState, PlaceCard, Screen, SectionHeader } from '@/components';
+import { cleanText } from '@/data/availability';
 import { categories } from '@/data/categories';
 import { usePlaces } from '@/data/placesStore';
 import { colors, fonts, radius, spacing } from '@/theme';
@@ -18,7 +19,8 @@ export default function ExploreScreen() {
   const results = useMemo(() => {
     const text = query.trim().toLowerCase();
     if (!text) return [];
-    return places.filter((p) => [p.title, p.area, p.tag, p.description].some((s) => s.toLowerCase().includes(text)));
+    const normalized = (value: unknown) => cleanText(value)?.toLowerCase() ?? '';
+    return places.filter((p) => [p.title, p.area, p.tag, p.description].some((value) => normalized(value).includes(text)));
   }, [places, query]);
 
   return (
@@ -30,9 +32,9 @@ export default function ExploreScreen() {
       </View>
 
       {query.trim() === '' ? (
-        categories.map((c) => <CategoryRow key={c.key} category={c} onPress={() => router.push({ pathname: '/category/[key]', params: { key: c.key } })} />)
+        categories.length === 0 ? <EmptyState message="No hay información disponible" /> : categories.map((c) => <CategoryRow key={c.key} category={c} onPress={() => router.push({ pathname: '/category/[key]', params: { key: c.key } })} />)
       ) : results.length === 0 ? (
-        <EmptyState message={`No encontramos resultados para “${query}”.`} />
+        <EmptyState message="No se encontraron resultados" />
       ) : (
         results.map((p) => <PlaceCard key={p.id} place={p} onPress={() => router.push({ pathname: '/place/[id]', params: { id: p.id } })} />)
       )}

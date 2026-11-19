@@ -9,6 +9,7 @@ import { colors, radius, shadow, spacing } from '@/theme';
 import { AppText } from './AppText';
 import { MAP_CARD_WIDTH, MapCard } from './MapCard';
 import { Pill } from './Pill';
+import { EmptyState } from './EmptyState';
 
 // Panel superior del mapa: filtro por categoría (RF-05), chips de sector y contador de lugares visibles.
 export function MapFilters({ filter, sector, count, notice, onCategory, onSector, style }: {
@@ -61,7 +62,13 @@ export function MapCardList({ places, selectedId, onSelect, onOpen, style }: {
     if (index >= 0) listRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0.5 });
   }, [selectedId]);
 
-  if (places.length === 0) return null;
+  if (places.length === 0) {
+    return (
+      <View style={[style, styles.emptyWrap]}>
+        <EmptyState message="No hay ubicaciones confirmadas para mostrar" />
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -84,4 +91,5 @@ const styles = StyleSheet.create({
   panel: { position: 'absolute', left: spacing.md, right: spacing.md, backgroundColor: colors.white, borderRadius: radius.lg, padding: spacing.md, ...shadow },
   row: { gap: spacing.sm, paddingVertical: spacing.sm },
   list: { gap: spacing.md, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  emptyWrap: { paddingVertical: spacing.lg, alignItems: 'center' },
 });

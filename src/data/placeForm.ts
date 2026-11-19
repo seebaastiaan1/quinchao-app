@@ -61,20 +61,19 @@ export function validatePlace(draft: PlaceDraft): PlaceErrors {
   if (!draft.description.trim()) errors.description = REQUIRED;
 
   const lat = parseCoordinate(draft.lat);
-  if (lat === null) errors.lat = 'Ingresa la latitud como número (ej.: -42,4709).';
-  else if (lat < -90 || lat > 90) errors.lat = 'La latitud debe estar entre -90 y 90.';
+  if (draft.lat.trim() && lat === null) errors.lat = 'Ingresa la latitud como número (ej.: -42,4709).';
+  else if (lat !== null && (lat < -90 || lat > 90)) errors.lat = 'La latitud debe estar entre -90 y 90.';
 
   const lng = parseCoordinate(draft.lng);
-  if (lng === null) errors.lng = 'Ingresa la longitud como número (ej.: -73,4909).';
-  else if (lng < -180 || lng > 180) errors.lng = 'La longitud debe estar entre -180 y 180.';
+  if (draft.lng.trim() && lng === null) errors.lng = 'Ingresa la longitud como número (ej.: -73,4909).';
+  else if (lng !== null && (lng < -180 || lng > 180)) errors.lng = 'La longitud debe estar entre -180 y 180.';
 
   const phone = draft.phone.trim();
   if (phone && !/^[0-9+ ]+$/.test(phone)) errors.phone = 'Usa solo números, "+" y espacios.';
 
   if (typeof draft.image === 'string') {
     const image = draft.image.trim();
-    if (!image) errors.image = REQUIRED;
-    else if (!isImageUri(image)) errors.image = 'La imagen debe ser una URL que empiece con https:// o una foto de la galería.';
+    if (image && !isImageUri(image)) errors.image = 'La imagen debe ser una URL que empiece con https:// o una foto de la galería.';
   }
 
   return errors;
@@ -83,7 +82,7 @@ export function validatePlace(draft: PlaceDraft): PlaceErrors {
 // Lugar sin id: el id lo asigna la pantalla "Agregar" (uniqueId) y no cambia al editar.
 export type PlaceInput = Omit<Place, 'id'>;
 
-const coordinateText = (n: number | undefined) => (n === undefined ? '' : String(n).replace('.', ','));
+const coordinateText = (n: number | null | undefined) => (typeof n === 'number' ? String(n).replace('.', ',') : '');
 
 export function placeToDraft(initial?: Partial<Place>): PlaceDraft {
   return {
@@ -103,9 +102,9 @@ export function placeToDraft(initial?: Partial<Place>): PlaceDraft {
 
 // Devuelve null si el borrador no pasa validatePlace.
 export function draftToPlace(draft: PlaceDraft): PlaceInput | null {
-  const lat = parseCoordinate(draft.lat);
-  const lng = parseCoordinate(draft.lng);
-  if (!draft.category || lat === null || lng === null) return null;
+  const lat = draft.lat.trim() ? parseCoordinate(draft.lat) : null;
+  const lng = draft.lng.trim() ? parseCoordinate(draft.lng) : null;
+  if (!draft.category) return null;
   if (Object.keys(validatePlace(draft)).length > 0) return null;
   const address = draft.address.trim();
   const phone = draft.phone.trim();
