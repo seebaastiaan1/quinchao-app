@@ -95,7 +95,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 - [ ] **6.3** Parámetros `category` y `focus`: aplicar filtro inicial y centrar el mapa. 
 - [ ] **6.4** Panel inferior (bottom sheet simple con `FlatList`) con la lista de lugares visibles y toque para ir al detalle.
 - [ ] **6.5** **Secciones por sector de la isla**: chips "Achao / Putique / Quinchao…" que reencuadran el mapa (`animateToRegion`). Objetivo del documento: mapa dividido en secciones para que no sea desordenado.
-- [ ] **6.6** Probar en Android e iOS (en Expo Go los mapas funcionan; en un build propio de Android hará falta una clave de Google Maps).
+- [x] **6.6** Probar en Android e iOS con tiles locales de OpenStreetMap y respaldo online en un build nativo de `react-native-maps`. *Caché nativa de tiles OSM online de 30 días configurada; queda pendiente validar el APK.*
 
 ### Fase 7 — Información útil (pantalla 10) — `app/(tabs)/info.tsx`
 - [ ] **7.1** Crear `src/data/info.ts` con los artículos (cómo llegar, moverse, clima/temporada, consejos).
@@ -114,7 +114,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 ### Fase 10 — Calidad y entrega
 - [ ] **10.1** Accesibilidad: etiquetas, contraste, tamaño de texto del sistema, área táctil ≥ 44 px. [RNF-01]
 - [ ] **10.2** Rendimiento: listas con `FlatList`, imágenes con tamaño fijo; respuesta < 2 s. [RNF-02]
-- [ ] **10.3** Funcionamiento sin internet: los datos son locales; mostrar un mensaje amable si faltan imágenes/mapa.
+- [ ] **10.3** Funcionamiento sin internet: los datos son locales; mostrar un mensaje amable si faltan imágenes/mapa. *Caché offline de tiles de Quinchao implementada; pendiente validar en dispositivo.*
 - [ ] **10.4** Recorridos de usuario del documento (probar a mano y anotar resultados):
   1. Inicio → Gastronomía → Detalle → Mapa/Llamar.
   2. Inicio → Reciclaje → Detalle → Mapa.

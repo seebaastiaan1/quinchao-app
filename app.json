@@ -21,13 +21,24 @@
       "bundleIdentifier": "cl.ulagos.quinchao"
     },
     "android": {
-      "package": "cl.ulagos.quinchao"
+      "package": "cl.ulagos.quinchao",
+      "config": {
+        "googleMaps": {
+          "apiKey": "TU_GOOGLE_MAPS_API_KEY"
+        }
+      }
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "7257eb0a-838c-42b6-baba-ca82ca56152d"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7257eb0a-838c-42b6-baba-ca82ca56152d"
     }
   }
 }
