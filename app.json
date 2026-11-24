@@ -13,8 +13,21 @@
     },
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "plugins": ["expo-router"],
-    "ios": { "supportsTablet": false, "bundleIdentifier": "cl.ulagos.quinchao" },
-    "android": { "package": "cl.ulagos.quinchao" }
+    "plugins": [
+      "expo-router"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "cl.ulagos.quinchao"
+    },
+    "android": {
+      "package": "cl.ulagos.quinchao"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7257eb0a-838c-42b6-baba-ca82ca56152d"
+      }
+    }
   }
 }
