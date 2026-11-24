@@ -51,14 +51,14 @@ src/
 Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** = cómo saber que está listo.
 
 ### Fase 0 — Preparar el entorno
-- [ ] **0.1** Instalar dependencias: `npm install`. *Verificación:* termina sin errores.
-- [ ] **0.2** Alinear versiones con Expo Go: `npx expo install --fix` y `npx expo-doctor`. Si Expo Go exige un SDK más nuevo: `npx expo install expo@latest` y luego `npx expo install --fix`. *Verificación:* `npx expo-doctor` sin errores críticos.
-- [ ] **0.3** Ejecutar `npx expo start`, escanear el QR con Expo Go y ver las 4 pestañas. *Verificación:* la app abre sin pantalla roja.
+- [x] **0.1** Instalar dependencias: `npm install`. *Verificación:* termina sin errores.
+- [x] **0.2** Alinear versiones con Expo Go: `npx expo install --fix` y `npx expo-doctor`. Si Expo Go exige un SDK más nuevo: `npx expo install expo@latest` y luego `npx expo install --fix`. *Verificación:* `npx expo-doctor` sin errores críticos.
+- [x] **0.3** Ejecutar `npx expo start`, escanear el QR con Expo Go y ver las 4 pestañas. *Verificación:* la app abre sin pantalla roja.
 - [x] **0.4** Crear `assets/icon.png` (1024×1024) y `assets/splash.png` con el logo y referenciarlos en `app.json` (`icon`, `splash`). *Verificación:* el ícono se ve en el build.
-- [ ] **0.5** `git init`, primer commit y repositorio compartido del equipo.
+- [x] **0.5** `git init`, primer commit y repositorio compartido del equipo.
 
 ### Fase 1 — Base visual (archivos: `src/theme`, `src/components`)
-- [ ] **1.1** Revisar que Poppins carga en todas las pantallas. *Verificación:* ningún texto usa la fuente del sistema.
+- [x] **1.1** Revisar que Poppins carga en todas las pantallas. *Verificación:* ningún texto usa la fuente del sistema.
 - [x] **1.2** Crear `src/components/EmptyState.tsx` (ícono + mensaje) y usarlo cuando una lista no tenga resultados.
 - [x] **1.3** Añadir un componente `SectionHeader` (eyebrow + título) y usarlo en Inicio, Explorar y Categoría para evitar repetir estilos.
 

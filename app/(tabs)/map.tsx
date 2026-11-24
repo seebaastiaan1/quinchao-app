@@ -1,13 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import MapView, { Marker, UrlTile, type Region } from 'react-native-maps';
+import MapView, { Geojson, Marker, UrlTile, type GeojsonProps, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Pill } from '@/components';
 import { categories } from '@/data/categories';
 import { getPlace, places } from '@/data/places';
 import type { CategoryKey } from '@/data/types';
 import { colors, radius, spacing } from '@/theme';
+import datosQuinchao from '../../assets/data/datos_quinchao.json';
 
 // Centro aproximado de la isla Quinchao
 const INITIAL_REGION: Region = { latitude: -42.45, longitude: -73.47, latitudeDelta: 0.22, longitudeDelta: 0.22 };
@@ -20,21 +21,69 @@ const hasValidCoordinates = (latitude: number, longitude: number) =>
   longitude >= -180 &&
   longitude <= 180;
 
+const geojson = datosQuinchao as GeojsonProps['geojson'];
+const geojsonOverlays: GeojsonProps['geojson'] = {
+  ...geojson,
+  features: geojson.features.filter((feature) => feature.geometry.type !== 'Point'),
+};
+const recyclingPoints = geojson.features.flatMap((feature, index) => {
+  if (feature.geometry.type !== 'Point') return [];
+
+  const [longitude, latitude] = feature.geometry.coordinates;
+  const title = feature.properties?.name;
+  if (!hasValidCoordinates(latitude, longitude) || typeof title !== 'string') return [];
+
+  return [{
+    id: `punto-verde-${index}`,
+    coordinate: { latitude, longitude },
+    title,
+    description: getFeatureDescription(feature.properties),
+  }];
+});
+
+function getFeatureDescription(
+  properties: GeojsonProps['geojson']['features'][number]['properties'],
+) {
+  const rawDescription: unknown = properties?.description;
+  let description: unknown;
+
+  if (typeof rawDescription === 'string') {
+    description = rawDescription;
+  } else if (
+    typeof rawDescription === 'object' &&
+    rawDescription !== null &&
+    'value' in rawDescription
+  ) {
+    description = rawDescription.value;
+  }
+
+  if (typeof description !== 'string') return undefined;
+
+  return description
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .trim();
+}
+
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { focus } = useLocalSearchParams<{ focus?: string }>();
   const mapRef = useRef<MapView>(null);
   const [filter, setFilter] = useState<CategoryKey | 'todo'>('todo');
+  const showsRecyclingPoints = filter === 'todo' || filter === 'reciclaje';
 
   const visible = useMemo(
     () =>
       places.filter(
         (place) =>
           (filter === 'todo' || place.category === filter) &&
+          (!showsRecyclingPoints || place.category !== 'reciclaje') &&
           hasValidCoordinates(place.lat, place.lng),
       ),
-    [filter],
+    [filter, showsRecyclingPoints],
   );
 
   useEffect(() => {
@@ -68,6 +117,24 @@ export default function MapScreen() {
           tileSize={256}
           zIndex={-1}
         />
+        {showsRecyclingPoints && (
+          <>
+            <Geojson
+              geojson={geojsonOverlays}
+              strokeColor={colors.geoJsonStroke}
+              strokeWidth={3}
+            />
+            {recyclingPoints.map((point) => (
+              <Marker
+                key={point.id}
+                coordinate={point.coordinate}
+                title={point.title}
+                description={point.description}
+                pinColor={colors.green}
+              />
+            ))}
+          </>
+        )}
         {visible.map((p) => (
           <Marker
             key={p.id}
@@ -89,7 +156,9 @@ export default function MapScreen() {
             <Pill key={c.key} label={c.label} active={filter === c.key} onPress={() => setFilter(c.key)} />
           ))}
         </ScrollView>
-        <AppText variant="small">{visible.length} lugares en esta área</AppText>
+        <AppText variant="small">
+          {visible.length + (showsRecyclingPoints ? recyclingPoints.length : 0)} lugares en esta área
+        </AppText>
       </View>
       <View style={styles.attribution}>
         <AppText variant="small">© OpenStreetMap contributors</AppText>

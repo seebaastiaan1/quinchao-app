@@ -2,6 +2,7 @@
 export const colors = {
   primary: '#3652c2',
   navy: '#243778',
+  geoJsonStroke: '#1E3A8A',
   deep: '#1b285c',
   sea: '#e8edff',
   mist: '#f4f6fa',

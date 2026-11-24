@@ -2,7 +2,7 @@
   "expo": {
     "name": "Quinchao",
     "slug": "quinchao-app",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "quinchao",
     "icon": "./assets/icon.png",
@@ -33,12 +33,6 @@
       "eas": {
         "projectId": "7257eb0a-838c-42b6-baba-ca82ca56152d"
       }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/7257eb0a-838c-42b6-baba-ca82ca56152d"
     }
   }
 }
