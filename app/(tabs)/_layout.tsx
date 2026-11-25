@@ -1,11 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 import { colors, fonts } from '@/theme';
 import type { IconName } from '@/data/types';
 
 const tab = (title: string, icon: IconName) => ({
   title,
-  tabBarIcon: ({ color, size }: { color: string; size: number }) => <Ionicons name={icon} size={size} color={color} />,
+  // Desde SDK 58 el color puede llegar como ColorValue (incluye null): se usa el gris de inactivo como respaldo
+  tabBarIcon: ({ color, size }: { color: ColorValue; size: number }) => (
+    <Ionicons name={icon} size={size} color={typeof color === 'string' ? color : colors.muted} />
+  ),
 });
 
 export default function TabsLayout() {

@@ -6,6 +6,8 @@ import { LEAFLET_CSS, LEAFLET_JS } from './leafletAssets.generated';
 // Mapa móvil: Leaflet + OpenStreetMap dentro de un WebView (sin API key de Google, igual en Android, iOS y Expo Go).
 // React Native -> mapa: window.qmap.<función>(datos) con injectJavaScript.
 // Mapa -> React Native: window.ReactNativeWebView.postMessage(JSON) con los tipos de MapEvent.
+// Excepción a la regla 4 de AGENTS.md (igual que map.web.tsx): este HTML corre dentro del WebView, no en React Native,
+// así que usa document/window y CSS. Los colores salen igualmente de los tokens de src/theme.
 
 export interface MapMarker {
   id: string;
@@ -56,11 +58,11 @@ export function buildMapHtml({ initial, islandCenter, greenPoints, padding }: Op
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <style>${LEAFLET_CSS}</style>
 <style>
-  html, body, #map { margin: 0; padding: 0; width: 100%; height: 100%; background: #e8edff; }
+  html, body, #map { margin: 0; padding: 0; width: 100%; height: 100%; background: ${colors.sea}; }
   body { font-family: -apple-system, Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
   .q-pin { box-sizing: border-box; border-radius: 50%; border: 3px solid ${colors.white}; box-shadow: 0 2px 6px ${colors.navy}66; }
   .q-popup-title { font-weight: 600; font-size: 15px; color: ${colors.navy}; margin-bottom: 2px; }
-  .q-popup-note { font-size: 13px; color: #555; white-space: pre-line; }
+  .q-popup-note { font-size: 13px; color: ${colors.muted}; white-space: pre-line; }
   .q-popup-link { display: inline-block; margin-top: 6px; padding: 6px 0; font-weight: 600; font-size: 14px; color: ${colors.primary}; background: none; border: 0; }
   .leaflet-top { top: ${padding.top}px; }
   .leaflet-bottom { bottom: ${padding.bottom}px; }

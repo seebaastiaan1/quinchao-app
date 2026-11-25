@@ -63,7 +63,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   hero: { padding: spacing.lg, paddingBottom: spacing.xl, gap: spacing.sm, justifyContent: 'flex-end', minHeight: 420, overflow: 'hidden' },
-  shade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(27,40,92,0.55)' },
+  shade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(27,40,92,0.55)' },
   logo: { position: 'absolute', alignSelf: 'center', width: 288, height: 82 },
   heroTitle: { color: colors.white, fontSize: 30, lineHeight: 38 },
   search: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.white, borderRadius: radius.md, paddingLeft: spacing.md, paddingRight: 6, paddingVertical: 6, marginTop: spacing.md },

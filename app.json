@@ -6,19 +6,36 @@
     "orientation": "portrait",
     "scheme": "quinchao",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "plugins": [
       "expo-router",
-      ["expo-image-picker", { "photosPermission": "La app necesita acceso a tus fotos para elegir la imagen de un lugar." }]
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La app necesita acceso a tus fotos para elegir la imagen de un lugar."
+        }
+      ],
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "expo-status-bar"
     ],
-    "ios": { "supportsTablet": false, "bundleIdentifier": "cl.ulagos.quinchao" },
-    "android": { "package": "cl.ulagos.quinchao" },
-    "web": { "bundler": "metro", "output": "single" }
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "cl.ulagos.quinchao"
+    },
+    "android": {
+      "package": "cl.ulagos.quinchao"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    }
   }
 }

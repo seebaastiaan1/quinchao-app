@@ -35,7 +35,8 @@ const toMarker = (p: Place & { lat: number; lng: number }): MapMarker => ({
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const webRef = useRef<WebView>(null);
+  // Genérico explícito: los tipos de react-native-webview 14 usan P = undefined y `Props & undefined` es never
+  const webRef = useRef<WebView<object>>(null);
   const ready = useRef(false);
   const { isOnline } = useOffline();
   const { places } = usePlaces();
@@ -103,7 +104,7 @@ export default function MapScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <WebView
+      <WebView<object>
         ref={webRef}
         style={[StyleSheet.absoluteFill, styles.web]}
         originWhitelist={['*']}

@@ -1,6 +1,6 @@
 # Quinchao App — instrucciones para agentes de IA
 
-App móvil de la Municipalidad de Quinchao (Chiloé). **Expo (SDK 54) + React Native + TypeScript + Expo Router.**
+App móvil de la Municipalidad de Quinchao (Chiloé). **Expo (SDK 58) + React Native + TypeScript + Expo Router.**
 Se prueba con **Expo Go** (no hay carpeta `android/` ni `ios/`; no hacer `prebuild`).
 El diseño de referencia viene del Figma Make (web) y del documento `app_quinchao_3_0.pdf`.
 
