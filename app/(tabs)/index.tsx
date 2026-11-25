@@ -54,6 +54,7 @@ export default function HomeScreen() {
           <CategoryRow key={c.key} category={c} onPress={() => router.push({ pathname: '/category/[key]', params: { key: c.key } })} />
         ))}
         {/* Botón de acceso rápido a emergencias (pantalla Inicio del documento) */}
+        <Button label="Ver agenda de actividades" icon="calendar-outline" variant="outline" onPress={() => router.push('/events')} />
         <Button label="Emergencias" icon="call-outline" variant="danger" onPress={() => router.push({ pathname: '/category/[key]', params: { key: 'emergencias' } })} />
       </View>
     </Screen>

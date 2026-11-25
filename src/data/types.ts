@@ -5,6 +5,18 @@ export type IconName = ComponentProps<typeof Ionicons>['name'];
 
 export type CategoryKey = 'gastronomia' | 'hospedajes' | 'experiencias' | 'emergencias' | 'reciclaje';
 
+export type EventType = 'cultural' | 'deportiva' | 'recreativa' | 'comunitaria';
+
+export interface EventItem {
+  id: string;
+  title: string;
+  date: string;
+  type: EventType;
+  place: string;
+  time: string;
+  description: string;
+}
+
 export interface Category {
   key: CategoryKey;
   title: string; // título grande de la pantalla

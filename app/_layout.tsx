@@ -24,6 +24,7 @@ function AppShell() {
       <SafeAreaInsetsContext.Provider value={isOnline ? insets : { ...insets, top: 0 }}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="events" />
           <Stack.Screen name="category/[key]" />
           <Stack.Screen name="place/[id]" />
           <Stack.Screen name="admin/index" />
