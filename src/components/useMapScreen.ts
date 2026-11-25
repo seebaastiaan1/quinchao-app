@@ -5,7 +5,7 @@ import { boundsOf, filterByCategory, filterBySector, isInside, type Bounds, type
 import { usePlace, usePlaces } from '@/data/placesStore';
 import type { Place } from '@/data/types';
 
-// Acciones sobre el mapa que implementa cada plataforma (react-native-maps o Leaflet).
+// Acciones sobre el mapa que implementa cada plataforma (Leaflet en WebView o Leaflet web).
 interface MapControls {
   frame: (bounds: Bounds | null) => void; // null = vista inicial de la isla
   center: (place: Place) => void;

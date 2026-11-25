@@ -1,7 +1,7 @@
 import type { CategoryKey, Place } from './types';
 import { hasValidLocation } from './availability';
 
-// Lógica del mapa compartida entre map.tsx (react-native-maps) y map.web.tsx (Leaflet).
+// Lógica del mapa compartida entre map.tsx (WebView) y map.web.tsx (Leaflet).
 export type CategoryFilter = CategoryKey | 'todo';
 
 export interface Bounds {

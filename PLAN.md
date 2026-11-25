@@ -97,7 +97,7 @@ Leyenda: **[RF-xx]** requerimiento funcional del documento · **Verificación** 
 - [ ] **6.3** Parámetros `category` y `focus`: aplicar filtro inicial y centrar el mapa. 
 - [ ] **6.4** Panel inferior (bottom sheet simple con `FlatList`) con la lista de lugares visibles y toque para ir al detalle.
 - [ ] **6.5** **Secciones por sector de la isla**: chips "Achao / Putique / Quinchao…" que reencuadran el mapa (`animateToRegion`). Objetivo del documento: mapa dividido en secciones para que no sea desordenado.
-- [x] **6.6** Probar en Android e iOS con tiles locales de OpenStreetMap y respaldo online en un build nativo de `react-native-maps`. *Caché nativa de tiles OSM online de 30 días configurada; queda pendiente validar el APK.*
+- [x] **6.6** Mapa móvil con Leaflet + OpenStreetMap en un WebView (`src/map/leafletHtml.ts`): sin API key de Google, igual en Android, iOS y Expo Go. Puntos verdes desde `assets/data/datos_quinchao.json`. *Pendiente: validar en el APK.*
 
 ### Fase 7 — Información útil (pantalla 10) — `app/(tabs)/info.tsx`
 - [ ] **7.1** Crear `src/data/info.ts` con los artículos (cómo llegar, moverse, clima/temporada, consejos).

@@ -1,91 +1,133 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import MapView, { Marker, type Region } from 'react-native-maps';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MapCardList, MapFilters, useMapScreen } from '@/components';
-import { getCategory } from '@/data/categories';
-import { ISLAND_CENTER, type Bounds } from '@/data/map';
+import { categoryColor } from '@/data/categories';
+import { greenPoints } from '@/data/greenPoints';
+import { ISLAND_CENTER } from '@/data/map';
 import { hasValidLocation } from '@/data/availability';
+import { usePlaces } from '@/data/placesStore';
 import type { Place } from '@/data/types';
+import { buildMapHtml, FOCUS_ZOOM, INITIAL_ZOOM, type InitialMapView, type MapEvent, type MapMarker } from '@/map/leafletHtml';
 import { useOffline } from '@/offline';
 import { colors, spacing } from '@/theme';
 
-// Versión móvil (react-native-maps). En web se usa map.web.tsx (Leaflet).
-const INITIAL_REGION: Region = { latitude: ISLAND_CENTER.lat, longitude: ISLAND_CENTER.lng, latitudeDelta: 0.22, longitudeDelta: 0.22 };
-const MIN_DELTA = 0.03;
+// Versión móvil: Leaflet + OpenStreetMap en un WebView (src/map/leafletHtml.ts). En web se usa map.web.tsx.
+// No necesita API key de Google y funciona igual en Android, iOS y Expo Go.
+const ISLAND: [number, number] = [ISLAND_CENTER.lat, ISLAND_CENTER.lng];
+// Origen ficticio de la página: OpenStreetMap pide un Referer válido para servir las imágenes del mapa
+const BASE_URL = 'https://app.quinchao.cl/';
+// Alto aproximado de los paneles sobre el mapa (filtros arriba, tarjetas abajo)
+const TOP_PANEL = 190;
+const BOTTOM_PANEL = 150;
 
-const regionAround = (p: Place): Region => ({
-  latitude: hasValidLocation(p) ? p.lat : ISLAND_CENTER.lat,
-  longitude: hasValidLocation(p) ? p.lng : ISLAND_CENTER.lng,
-  latitudeDelta: 0.02,
-  longitudeDelta: 0.02,
-});
-
-// Margen x2 para que los marcadores no queden bajo los paneles superior e inferior
-const regionFromBounds = (b: Bounds): Region => ({
-  latitude: (b.south + b.north) / 2,
-  longitude: (b.west + b.east) / 2,
-  latitudeDelta: Math.max((b.north - b.south) * 2, MIN_DELTA),
-  longitudeDelta: Math.max((b.east - b.west) * 2, MIN_DELTA),
-});
-
-const boundsFromRegion = (r: Region): Bounds => ({
-  south: r.latitude - r.latitudeDelta / 2,
-  north: r.latitude + r.latitudeDelta / 2,
-  west: r.longitude - r.longitudeDelta / 2,
-  east: r.longitude + r.longitudeDelta / 2,
+const toMarker = (p: Place & { lat: number; lng: number }): MapMarker => ({
+  id: p.id,
+  lat: p.lat,
+  lng: p.lng,
+  color: categoryColor(p.category),
+  title: p.title,
+  note: typeof p.note === 'string' ? p.note : null,
 });
 
 export default function MapScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const mapRef = useRef<MapView>(null);
+  const webRef = useRef<WebView>(null);
+  const ready = useRef(false);
   const { isOnline } = useOffline();
+  const { places } = usePlaces();
+
+  // Ejecuta una función de window.qmap dentro del WebView (se ignora hasta que el mapa avise que está listo)
+  const call = (fn: string, ...args: unknown[]) => {
+    if (!ready.current) return;
+    webRef.current?.injectJavaScript(`window.qmap && window.qmap.${fn}(${args.map((a) => JSON.stringify(a)).join(',')}); true;`);
+  };
+
   const map = useMapScreen({
-    frame: (b) => mapRef.current?.animateToRegion(b ? regionFromBounds(b) : INITIAL_REGION, 400),
-    center: (p) => mapRef.current?.animateToRegion(regionAround(p), 400),
+    frame: (b) => call('frame', b),
+    center: (p) => {
+      if (hasValidLocation(p)) call('center', p.lat, p.lng);
+    },
   });
-  const [initialRegion] = useState(() => {
+
+  // El HTML se arma una sola vez con la vista inicial; lo demás se actualiza con mensajes
+  const [html] = useState(() => {
     const { place, bounds } = map.initialView;
-    if (place) return regionAround(place);
-    return bounds ? regionFromBounds(bounds) : INITIAL_REGION;
+    const initial: InitialMapView =
+      place && hasValidLocation(place)
+        ? { center: [place.lat, place.lng], zoom: FOCUS_ZOOM }
+        : bounds
+          ? { bounds }
+          : { center: ISLAND, zoom: INITIAL_ZOOM };
+    return buildMapHtml({ initial, islandCenter: ISLAND, greenPoints, padding: { top: insets.top + TOP_PANEL, bottom: BOTTOM_PANEL } });
   });
+
+  // Se dibujan todos los lugares del filtro (no solo los del área visible) para poder recorrer el mapa
+  const markers = useMemo(
+    () => places.filter((p) => (map.filter === 'todo' || p.category === map.filter) && hasValidLocation(p)).map((p) => toMarker(p as Place & { lat: number; lng: number })),
+    [places, map.filter],
+  );
+  const showGreenPoints = map.filter === 'todo' || map.filter === 'reciclaje';
+
+  const syncAll = () => {
+    call('setPlaces', markers, map.selectedId ?? null);
+    call('setGreenPoints', showGreenPoints);
+  };
+  useEffect(syncAll, [markers, showGreenPoints]);
+  useEffect(() => call('setSelected', map.selectedId ?? null), [map.selectedId]);
 
   const openPlace = (p: Place) => router.push({ pathname: '/place/[id]', params: { id: p.id } });
 
+  const onMessage = (e: WebViewMessageEvent) => {
+    let msg: MapEvent;
+    try {
+      msg = JSON.parse(e.nativeEvent.data) as MapEvent;
+    } catch {
+      return;
+    }
+    if (msg.type === 'ready') {
+      ready.current = true;
+      syncAll();
+    } else if (msg.type === 'bounds') {
+      map.setViewBounds(msg.bounds);
+    } else {
+      const place = places.find((p) => p.id === msg.id);
+      if (!place) return;
+      if (msg.type === 'select') map.selectPlace(place);
+      else openPlace(place);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      <MapView
-        ref={mapRef}
-        style={StyleSheet.absoluteFill}
-        initialRegion={initialRegion}
-        onMapReady={() => map.setViewBounds(boundsFromRegion(initialRegion))}
-        onRegionChangeComplete={(r) => map.setViewBounds(boundsFromRegion(r))}
-      >
-        {map.visible.map((p) => {
-          const category = getCategory(p.category);
-          const selected = p.id === map.selectedId;
-          const size = selected ? 40 : 30;
-          if (!hasValidLocation(p)) return null;
-          return (
-            <Marker
-              key={p.id}
-              coordinate={{ latitude: p.lat, longitude: p.lng }}
-              title={p.title}
-              description={typeof p.note === 'string' ? p.note : undefined}
-              onPress={() => map.selectPlace(p)}
-              onCalloutPress={() => openPlace(p)}
-            >
-              {/* Marcador con color e ícono por categoría (RF-05) */}
-              <View style={[styles.marker, { width: size, height: size, borderRadius: size / 2, backgroundColor: category?.color ?? colors.primary }]}>
-                <Ionicons name={category?.icon ?? 'location-outline'} size={selected ? 20 : 15} color={colors.white} />
-              </View>
-            </Marker>
-          );
-        })}
-      </MapView>
+      <WebView
+        ref={webRef}
+        style={[StyleSheet.absoluteFill, styles.web]}
+        originWhitelist={['*']}
+        source={{ html, baseUrl: BASE_URL }}
+        onMessage={onMessage}
+        // Si Android cierra el proceso del WebView en segundo plano, se vuelve a cargar el mapa
+        onRenderProcessGone={() => {
+          ready.current = false;
+          webRef.current?.reload();
+        }}
+        onContentProcessDidTerminate={() => {
+          ready.current = false;
+          webRef.current?.reload();
+        }}
+        cacheEnabled
+        cacheMode={isOnline ? 'LOAD_DEFAULT' : 'LOAD_CACHE_ELSE_NETWORK'}
+        javaScriptEnabled
+        domStorageEnabled
+        setSupportMultipleWindows={false}
+        overScrollMode="never"
+        bounces={false}
+        scrollEnabled={false}
+        accessibilityLabel="Mapa de la isla Quinchao"
+      />
 
       <MapFilters
         filter={map.filter}
@@ -102,6 +144,6 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  marker: { alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: colors.white },
+  web: { backgroundColor: colors.sea },
   cards: { position: 'absolute', left: 0, right: 0, bottom: spacing.sm },
 });
