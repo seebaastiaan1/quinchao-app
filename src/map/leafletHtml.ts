@@ -1,5 +1,4 @@
 import type { Bounds } from '@/data/map';
-import type { GreenPoint } from '@/data/greenPoints';
 import { colors } from '@/theme';
 import { LEAFLET_CSS, LEAFLET_JS } from './leafletAssets.generated';
 
@@ -32,7 +31,6 @@ export const INITIAL_ZOOM = 12;
 interface Options {
   initial: InitialMapView;
   islandCenter: [number, number];
-  greenPoints: GreenPoint[];
   // Espacio que ocupan los paneles superior e inferior, para encuadrar sin tapar marcadores
   padding: { top: number; bottom: number };
 }
@@ -40,15 +38,13 @@ interface Options {
 // Se pasa como JSON dentro de <script>: se escapa "<" para que ningún texto pueda cerrar la etiqueta.
 const toScriptJson = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
 
-export function buildMapHtml({ initial, islandCenter, greenPoints, padding }: Options): string {
+export function buildMapHtml({ initial, islandCenter, padding }: Options): string {
   const config = {
     initial,
     islandCenter,
     initialZoom: INITIAL_ZOOM,
     focusZoom: FOCUS_ZOOM,
-    greenPoints,
     padding,
-    colors: { white: colors.white, navy: colors.navy, primary: colors.primary, green: colors.green },
   };
 
   return `<!DOCTYPE html>
@@ -120,17 +116,6 @@ export function buildMapHtml({ initial, islandCenter, greenPoints, padding }: Op
     return box;
   };
 
-  // Puntos verdes del GeoJSON municipal (capa aparte, se activa con "Todo" y "Reciclaje")
-  var greenLayer = L.layerGroup();
-  cfg.greenPoints.forEach(function (g) {
-    var box = el('div', '');
-    box.appendChild(el('div', 'q-popup-title', g.name));
-    if (g.materials) box.appendChild(el('div', 'q-popup-note', 'Recibe:\\n' + g.materials));
-    L.circleMarker([g.lat, g.lng], { radius: 7, color: cfg.colors.white, weight: 2, fillColor: cfg.colors.green, fillOpacity: 0.9 })
-      .bindPopup(box, { autoPan: false })
-      .addTo(greenLayer);
-  });
-
   window.qmap = {
     setPlaces: function (data, selected) {
       lastData = data;
@@ -152,10 +137,6 @@ export function buildMapHtml({ initial, islandCenter, greenPoints, padding }: Op
         var m = markers[p.id];
         if (m) { m.setIcon(pinIcon(p.color, p.id === id)); m.setZIndexOffset(p.id === id ? 1000 : 0); }
       });
-    },
-    setGreenPoints: function (show) {
-      if (show && !map.hasLayer(greenLayer)) greenLayer.addTo(map);
-      if (!show && map.hasLayer(greenLayer)) map.removeLayer(greenLayer);
     },
     frame: function (b) {
       if (b) map.flyToBounds(toLatLngBounds(b), fitOptions);

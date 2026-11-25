@@ -23,7 +23,7 @@ export function MapCard({ place, selected, onPress, onOpen }: { place: Place; se
       <View style={styles.copy}>
         <View style={styles.meta}>
           <View style={[styles.dot, { backgroundColor: color }]} />
-          <AppText variant="small" numberOfLines={1} style={{ flex: 1 }}>{place.tag} · {place.area}</AppText>
+          <AppText variant="small" numberOfLines={1} style={{ flex: 1 }}>{[place.tag, place.area.trim()].filter(Boolean).join(' · ')}</AppText>
         </View>
         <AppText variant="heading" numberOfLines={1} style={{ fontSize: 15 }}>{place.title}</AppText>
         <Pressable onPress={onOpen} accessibilityRole="link" accessibilityLabel={`Ver ficha de ${place.title}`} style={styles.link}>

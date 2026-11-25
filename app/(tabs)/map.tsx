@@ -5,7 +5,6 @@ import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MapCardList, MapFilters, useMapScreen } from '@/components';
 import { categoryColor } from '@/data/categories';
-import { greenPoints } from '@/data/greenPoints';
 import { ISLAND_CENTER } from '@/data/map';
 import { hasValidLocation } from '@/data/availability';
 import { usePlaces } from '@/data/placesStore';
@@ -63,7 +62,7 @@ export default function MapScreen() {
         : bounds
           ? { bounds }
           : { center: ISLAND, zoom: INITIAL_ZOOM };
-    return buildMapHtml({ initial, islandCenter: ISLAND, greenPoints, padding: { top: insets.top + TOP_PANEL, bottom: BOTTOM_PANEL } });
+    return buildMapHtml({ initial, islandCenter: ISLAND, padding: { top: insets.top + TOP_PANEL, bottom: BOTTOM_PANEL } });
   });
 
   // Se dibujan todos los lugares del filtro (no solo los del área visible) para poder recorrer el mapa
@@ -71,13 +70,9 @@ export default function MapScreen() {
     () => places.filter((p) => (map.filter === 'todo' || p.category === map.filter) && hasValidLocation(p)).map((p) => toMarker(p as Place & { lat: number; lng: number })),
     [places, map.filter],
   );
-  const showGreenPoints = map.filter === 'todo' || map.filter === 'reciclaje';
 
-  const syncAll = () => {
-    call('setPlaces', markers, map.selectedId ?? null);
-    call('setGreenPoints', showGreenPoints);
-  };
-  useEffect(syncAll, [markers, showGreenPoints]);
+  const syncAll = () => call('setPlaces', markers, map.selectedId ?? null);
+  useEffect(syncAll, [markers]);
   useEffect(() => call('setSelected', map.selectedId ?? null), [map.selectedId]);
 
   const openPlace = (p: Place) => router.push({ pathname: '/place/[id]', params: { id: p.id } });

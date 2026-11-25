@@ -3,10 +3,9 @@ import L from 'leaflet';
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { CircleMarker, MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import { AppText, MapCardList, MapFilters, useMapScreen } from '@/components';
 import { categoryColor } from '@/data/categories';
-import { greenPoints } from '@/data/greenPoints';
 import { ISLAND_CENTER, type Bounds } from '@/data/map';
 import { hasValidLocation } from '@/data/availability';
 import type { Place } from '@/data/types';
@@ -79,19 +78,6 @@ export default function MapScreen() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <ViewportTracker onChange={map.setViewBounds} />
-          {/* Puntos verdes del GeoJSON municipal, con "Todo" y "Reciclaje" */}
-          {(map.filter === 'todo' || map.filter === 'reciclaje') &&
-            greenPoints.map((g) => (
-              <CircleMarker key={g.id} center={[g.lat, g.lng]} radius={7} pathOptions={{ color: colors.white, weight: 2, fillColor: colors.green, fillOpacity: 0.9 }}>
-                <Popup autoPan={false}>
-                  <View style={styles.popup}>
-                    <AppText variant="heading" style={{ fontSize: 15 }}>{g.name}</AppText>
-                    {g.materials && <AppText variant="small">{`Recibe:
-${g.materials}`}</AppText>}
-                  </View>
-                </Popup>
-              </CircleMarker>
-            ))}
           {map.visible.map((p) => {
             if (!hasValidLocation(p)) return null;
             return (

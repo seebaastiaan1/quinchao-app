@@ -1,3 +1,4 @@
+import { greenPointPlaces } from './greenPoints';
 import type { Place } from './types';
 
 // Fotos de ejemplo (Unsplash, usadas en el boceto). Reemplazar por imágenes autorizadas por la municipalidad.
@@ -13,7 +14,7 @@ export const photos = {
 };
 
 // DATOS DE EJEMPLO tomados del boceto de Figma Make. Reemplazar por datos reales de la municipalidad.
-export const places: Place[] = [
+const samplePlaces: Place[] = [
   // TODO(equipo): Agregar gastronomía con datos municipales confirmados: nombre, sector, horario,
   // teléfono y coordenadas verificadas.
   // Hospedajes
@@ -34,5 +35,10 @@ export const places: Place[] = [
   { id: 'acopio-municipal', category: 'reciclaje', title: 'Punto de acopio municipal', area: 'Achao', tag: 'Electrónicos · Pilas', image: photos.hero, note: 'Solo días hábiles', description: 'Recepción de residuos electrónicos y pilas.', address: 'Av. 21 de Mayo 01', lat: -42.4735, lng: -73.4875 },
 ];
 
-export const getPlace = (id: string) => places.find((p) => p.id === id);
+// Puntos verdes reales del GeoJSON municipal (ver greenPoints.ts); toman el sector de los lugares de arriba
+export const greenPoints: Place[] = greenPointPlaces(samplePlaces);
+
+export const places: Place[] = [...samplePlaces, ...greenPoints];
+
+export const getPlace =(id: string) => places.find((p) => p.id === id);
 export const placesByCategory = (key: string) => places.filter((p) => p.category === key);

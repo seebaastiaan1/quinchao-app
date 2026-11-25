@@ -1,10 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { places as initialPlaces } from './places';
+import { greenPoints, places as initialPlaces } from './places';
 import type { CategoryKey, Place } from './types';
 
 // Único punto de lectura/escritura de lugares. En v2 se podrá conectar a un servidor sin tocar las pantallas.
 const STORAGE_KEY = 'quinchao:places:v1';
+// Versión de los datos iniciales ya entregados al teléfono. Al subirla se agregan una vez los lugares nuevos
+// a la lista guardada, sin pisar lo que el administrador editó o borró después.
+const SEED_KEY = 'quinchao:places:seed';
+const SEED_VERSION = 2; // 2 = puntos verdes del GeoJSON municipal
 
 const CATEGORY_KEYS: readonly CategoryKey[] = ['gastronomia', 'hospedajes', 'experiencias', 'emergencias', 'reciclaje'];
 
@@ -53,6 +57,13 @@ function parseStored(raw: string): Place[] | null {
   }
 }
 
+// Agrega a la lista guardada los lugares de las versiones de datos que este teléfono aún no recibió
+function migrate(stored: Place[], seedVersion: number): Place[] {
+  if (seedVersion >= 2) return stored;
+  const ids = new Set(stored.map((p) => p.id));
+  return [...stored, ...greenPoints.filter((p) => !ids.has(p.id))];
+}
+
 function persist(list: Place[]) {
   AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(list)).catch(() => {
     // Si no se puede guardar, los cambios siguen en memoria mientras la app esté abierta.
@@ -65,11 +76,19 @@ export function PlacesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((raw) => {
-        if (!active || raw === null) return;
-        const stored = parseStored(raw);
-        if (stored) setPlaces(stored);
+    AsyncStorage.multiGet([STORAGE_KEY, SEED_KEY])
+      .then(([[, raw], [, seed]]) => {
+        if (!active) return;
+        const stored = raw === null ? null : parseStored(raw);
+        if (stored) {
+          const seedVersion = Number(seed) || 1;
+          const migrated = migrate(stored, seedVersion);
+          setPlaces(migrated);
+          if (migrated !== stored) persist(migrated);
+        }
+        AsyncStorage.setItem(SEED_KEY, String(SEED_VERSION)).catch(() => {
+          // Si no se guarda, la próxima vez se vuelve a intentar sin duplicar (se comparan los id).
+        });
       })
       .catch(() => {
         // Lectura fallida: se mantienen los datos iniciales.
