@@ -2,6 +2,7 @@
   "expo": {
     "name": "Quinchao",
     "slug": "quinchao-app",
+    "owner": "purplesebas-team",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "quinchao",
@@ -31,11 +32,24 @@
       "bundleIdentifier": "cl.ulagos.quinchao"
     },
     "android": {
-      "package": "cl.ulagos.quinchao"
+      "package": "cl.ulagos.quinchao",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "single"
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "cc0596aa-c634-4822-85d1-0de84aec528e"
+      }
     }
   }
 }
