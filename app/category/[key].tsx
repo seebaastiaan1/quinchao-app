@@ -47,7 +47,7 @@ export default function CategoryScreen() {
       )}
       {/* TODO(plan fase 5): filtros "Cerca de mí" y "Abierto ahora" */}
       {items.length === 0 ? (
-        <EmptyState message="Todavía no hay lugares en esta categoría." />
+        <EmptyState message="No hay información disponible" />
       ) : (
         items.map((p) => <PlaceCard key={p.id} place={p} onPress={() => router.push({ pathname: '/place/[id]', params: { id: p.id } })} />)
       )}

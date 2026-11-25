@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { AppText, Button, PlaceImage, Screen } from '@/components';
 import { callPlace, openDirections } from '@/data/actions';
+import { cleanPhone, cleanText, hasValidLocation } from '@/data/availability';
 import { usePlace, usePlaces } from '@/data/placesStore';
 import { useOffline } from '@/offline';
 import { colors, radius, spacing } from '@/theme';
@@ -14,7 +15,6 @@ export default function PlaceScreen() {
   const place = usePlace(id);
   const { isOnline } = useOffline();
 
-  // Mientras se leen los datos guardados, un lugar recién creado todavía no aparece.
   if (!place && !ready) return <Screen>{null}</Screen>;
 
   if (!place) {
@@ -26,51 +26,74 @@ export default function PlaceScreen() {
     );
   }
 
+  const tag = cleanText(place.tag);
+  const area = cleanText(place.area);
+  const title = cleanText(place.title) ?? 'Información no disponible';
+  const note = cleanText(place.note);
+  const description = cleanText(place.description);
+  const address = cleanText(place.address);
+  const phone = cleanPhone(place.phone);
+  const locationConfirmed = hasValidLocation(place);
+
   return (
     <Screen>
-      <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Volver" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        <Ionicons name="chevron-back" size={20} color={colors.primary} />
-        <AppText style={{ color: colors.primary }}>Volver</AppText>
-      </Pressable>
+      <View style={styles.backRow}>
+        <Button label="Volver" icon="chevron-back-outline" variant="outline" onPress={() => router.back()} />
+      </View>
 
       <PlaceImage image={place.image} style={{ width: '100%', height: 220, borderRadius: radius.lg, backgroundColor: colors.mist }} />
 
       <View style={{ gap: spacing.xs }}>
-        <AppText variant="eyebrow">{place.tag} · {place.area}</AppText>
-        <AppText variant="title">{place.title}</AppText>
+        {(tag || area) && <AppText variant="eyebrow">{[tag, area].filter(Boolean).join(' · ')}</AppText>}
+        <AppText variant="title">{title}</AppText>
       </View>
 
       <View style={{ gap: spacing.sm }}>
-        {place.address && (
-          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        {locationConfirmed && address ? (
+          <View style={styles.row}>
             <Ionicons name="location-outline" size={18} color={colors.turquoise} />
-            <AppText style={{ flex: 1 }}>{place.address}</AppText>
+            <AppText style={{ flex: 1 }}>{address}</AppText>
+          </View>
+        ) : (
+          <View style={[styles.row, styles.unconfirmed]}>
+            <Ionicons name="location-outline" size={18} color={colors.danger} />
+            <AppText style={{ flex: 1, color: colors.danger }}>Ubicación no confirmada</AppText>
           </View>
         )}
-        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-          <Ionicons name="time-outline" size={18} color={colors.turquoise} />
-          <AppText style={{ flex: 1 }}>{place.note}</AppText>
-        </View>
+        {note && (
+          <View style={styles.row}>
+            <Ionicons name="time-outline" size={18} color={colors.turquoise} />
+            <AppText style={{ flex: 1 }}>{note}</AppText>
+          </View>
+        )}
       </View>
 
-      <AppText>{place.description}</AppText>
+      <AppText>{description ?? 'Información no disponible'}</AppText>
 
-      {/* Pantalla 10 "Contacto": acciones directas */}
       <View style={{ gap: spacing.sm }}>
-        {place.phone && <Button label={`Llamar · ${place.phone}`} icon="call-outline" onPress={() => callPlace(place.phone)} />}
-        <Button label="Cómo llegar" icon="navigate-outline" variant={place.phone ? 'outline' : 'primary'} onPress={() => openDirections(place)} />
-        <Button
-          label="Ver en el mapa"
-          icon="map-outline"
-          variant="outline"
-          onPress={() => router.push({ pathname: '/map', params: { focus: place.id } })}
-        />
+        {phone && <Button label={`Llamar · ${phone}`} icon="call-outline" onPress={() => callPlace(phone)} />}
+        {locationConfirmed && (
+          <Button label="Cómo llegar" icon="navigate-outline" variant={phone ? 'outline' : 'primary'} onPress={() => openDirections(place)} />
+        )}
+        {locationConfirmed && (
+          <Button
+            label="Ver en el mapa"
+            icon="map-outline"
+            variant="outline"
+            onPress={() => router.push({ pathname: '/map', params: { focus: place.id } })}
+          />
+        )}
+        {!phone && <AppText variant="small" style={{ color: colors.muted }}>Contacto no disponible</AppText>}
         {!isOnline && (
-          <AppText variant="small">
-            Sin conexión: «Cómo llegar» y el mapa necesitan internet.{place.phone ? ' Llamar funciona sin internet.' : ''}{place.address ? ` Dirección: ${place.address}.` : ''}
-          </AppText>
+          <AppText variant="small">Sin conexión: el mapa y las indicaciones necesitan internet.{phone ? ' Llamar funciona sin internet.' : ''}</AppText>
         )}
       </View>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  backRow: { alignSelf: 'flex-start' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  unconfirmed: { backgroundColor: colors.sea, borderRadius: radius.md, padding: spacing.sm },
+});

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MapCardList, MapFilters, useMapScreen } from '@/components';
 import { getCategory } from '@/data/categories';
 import { ISLAND_CENTER, type Bounds } from '@/data/map';
+import { hasValidLocation } from '@/data/availability';
 import type { Place } from '@/data/types';
 import { useOffline } from '@/offline';
 import { colors, spacing } from '@/theme';
@@ -15,7 +16,12 @@ import { colors, spacing } from '@/theme';
 const INITIAL_REGION: Region = { latitude: ISLAND_CENTER.lat, longitude: ISLAND_CENTER.lng, latitudeDelta: 0.22, longitudeDelta: 0.22 };
 const MIN_DELTA = 0.03;
 
-const regionAround = (p: Place): Region => ({ latitude: p.lat, longitude: p.lng, latitudeDelta: 0.02, longitudeDelta: 0.02 });
+const regionAround = (p: Place): Region => ({
+  latitude: hasValidLocation(p) ? p.lat : ISLAND_CENTER.lat,
+  longitude: hasValidLocation(p) ? p.lng : ISLAND_CENTER.lng,
+  latitudeDelta: 0.02,
+  longitudeDelta: 0.02,
+});
 
 // Margen x2 para que los marcadores no queden bajo los paneles superior e inferior
 const regionFromBounds = (b: Bounds): Region => ({
@@ -62,12 +68,13 @@ export default function MapScreen() {
           const category = getCategory(p.category);
           const selected = p.id === map.selectedId;
           const size = selected ? 40 : 30;
+          if (!hasValidLocation(p)) return null;
           return (
             <Marker
               key={p.id}
               coordinate={{ latitude: p.lat, longitude: p.lng }}
               title={p.title}
-              description={p.note}
+              description={typeof p.note === 'string' ? p.note : undefined}
               onPress={() => map.selectPlace(p)}
               onCalloutPress={() => openPlace(p)}
             >

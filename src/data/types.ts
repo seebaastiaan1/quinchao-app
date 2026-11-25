@@ -21,12 +21,11 @@ export interface Place {
   title: string;
   area: string; // sector de la isla: Achao, Putique, Quinchao, Palqui...
   tag: string;
-  image: string | number;
-  note: string; // horario o dato corto
-  description: string;
-  address?: string;
-  phone?: string;
-  // TODO(equipo): coordenadas APROXIMADAS, verificar con Google Maps antes de entregar.
-  lat: number;
-  lng: number;
+  image?: string | number | null;
+  note?: string | null; // horario o dato corto
+  description?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }

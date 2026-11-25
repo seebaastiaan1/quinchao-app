@@ -53,7 +53,11 @@ export function PlaceForm({ initial, onSubmit, submitLabel = 'Guardar' }: {
   };
 
   const hasErrors = Object.values(errors).some(Boolean);
-  const preview = typeof draft.image === 'number' ? draft.image : isImageUri(draft.image) ? { uri: draft.image.trim() } : null;
+  const preview = typeof draft.image === 'number'
+    ? draft.image
+    : typeof draft.image === 'string' && isImageUri(draft.image)
+      ? { uri: draft.image.trim() }
+      : null;
 
   return (
     <View style={{ gap: spacing.lg }}>
